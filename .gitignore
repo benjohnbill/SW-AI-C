@@ -1,0 +1,15 @@
+# 컴파일 산출물 — gcc -g <file> -o <확장자 없는 같은 이름> 이라 소스 옆에 쌓인다
+Data-Structures/**/Q*
+!Data-Structures/**/Q*.c
+*.o
+*.out
+a.out
+core
+core.*
+*.dSYM/
+
+# 대조용 정답본을 만든다면 아래 줄의 주석을 해제한다.
+# 이 레포는 public이므로, 추적하는 순간 풀이가 그대로 공개된다.
+# ANSWER_*.c
+
+.DS_Store
