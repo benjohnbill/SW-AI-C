@@ -137,14 +137,26 @@ ask only the first two.
 
 These are direct requests. Answer them plainly; they are not the exercise.
 
-- The container is Ubuntu with `build-essential`, `gcc`, `gdb`, `valgrind`,
-  `make`, `python3`. User `jungle`, working directory `/home/jungle`.
-- `F5` in VS Code runs the `C/C++: gcc build active file` task
-  (`gcc -g <file> -o <file without extension>`) and then attaches gdb. Breakpoints,
-  variable inspection, and the call stack all work from there.
-- By hand: `gcc -g Q1_A_LL.c -o Q1_A_LL && ./Q1_A_LL`.
+He edits in **Zed** (Windows Zed connected to WSL over remote), not VS Code. The
+template's `.vscode/` and `.devcontainer/` folders are therefore inert for him —
+Zed has no Dev Containers support and does not read `tasks.json` or
+`launch.json`. Never tell him to press `F5` or to reopen in a container. Leave
+those folders in place; a teammate on VS Code may use them.
+
+The working environment is the WSL host directly: Ubuntu 26.04, gcc 15, make.
+No container is needed for this week.
+
+- Build and run: `gcc -g Q1_A_LL.c -o Q1_A_LL && ./Q1_A_LL`. `main()` is a
+  `scanf` menu loop, so testing means typing the menu choices by hand.
+- Debug: `gdb ./Q1_A_LL` in Zed's built-in terminal — `break`, `run`, `next`,
+  `print *ptr`, `bt`. Zed 1.19 also ships a DAP debugger, but his settings do
+  not configure one; do not assume it is set up.
 - Leaks and invalid reads: `valgrind --leak-check=full ./Q1_A_LL`.
 - Compiled binaries land next to the source. `.gitignore` already excludes them.
+
+Note: gcc 15 defaults to C23, where an implicit function declaration is an
+error, not a warning. If old code fails to build for that reason, `-std=gnu17`
+is the first thing to try — this template compiles clean without it.
 
 ## Interaction rules
 
