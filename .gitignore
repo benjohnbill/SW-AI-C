@@ -13,3 +13,6 @@ core.*
 # ANSWER_*.c
 
 .DS_Store
+
+# make 로 만든 실행 파일
+build/
