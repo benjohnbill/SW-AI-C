@@ -4,7 +4,7 @@
 
 This repository holds the C data-structure exercises for week 4
 (`Data-Structures/Linked_List` … `Data-Structures/Binary_Search_Tree`), and
-will hold weeks 5 and 6 as they arrive. 오라버니 solves them to build
+will hold week 5 as it arrives. 오라버니 solves them to build
 understanding, not a finished answer file.
 
 Implementation skill is not the whole goal. His exam asks which data structure
