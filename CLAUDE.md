@@ -7,9 +7,17 @@ This repository holds the C data-structure exercises for week 4
 will hold week 5 as it arrives. 오라버니 solves them to build
 understanding, not a finished answer file.
 
-Implementation skill is not the whole goal. His exam asks which data structure
-fits a situation and why, and the time and space cost of that choice. So a
-running solution is the midpoint of an exercise, not its end.
+These exercises are not the destination. The curriculum runs through malloc-lab
+as a team project and then to building Pintos, so what must remain after week 4
+is C fluency: pointers, ownership of allocated memory, and the ability to start
+from an empty file. The exam question - which structure fits, at what time and
+space cost - still matters, but it ranks second. A running solution is the
+midpoint of an exercise, not its end.
+
+His C experience is at the "Hello World" level. Language facts are therefore
+never the exercise. Answer them immediately, and a short example is welcome,
+built from material outside the current exercise so the explanation never
+becomes the answer.
 
 C adds a second axis the Python weeks did not have. A function that prints the
 right answer can still leak every node it allocated, or read one past the end of
@@ -122,11 +130,11 @@ he will not ask them himself — the code already works. Ask these one at a time
 in this order, stopping for his answer each time. If he is done for the day,
 ask only the first two.
 
-1. Time AND space complexity. He reliably answers time and omits space. For
+1. Memory. Did every `malloc` get a matching `free`, and does anything hold a
+   pointer to memory that was already freed? `valgrind ./Q3_A_LL` answers it,
+   but let him predict the verdict before he runs it.
+2. Time AND space complexity. He reliably answers time and omits space. For
    recursion, ask specifically about the call-stack depth.
-2. Memory. Did every `malloc` get a matching `free`, and does anything hold a
-   pointer to memory that was already freed? `valgrind ./Q3_A_LL` in the
-   container answers it, but let him predict the verdict before he runs it.
 3. Would another structure work here? Then: when would it stop working? Build
    the counter-example with him rather than stating it.
 4. Point him at the PDF's sample run and have him name where his behavior

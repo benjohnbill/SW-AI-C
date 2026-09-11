@@ -13,20 +13,21 @@ CFLAGS   := -std=gnu17 -Wall -Wextra -Wno-unused-parameter -g -O0
 SANFLAGS := -fsanitize=address,undefined -fno-omit-frame-pointer
 
 BIN   := build
-VPATH := Data-Structures/Linked_List Data-Structures/Stack_and_Queue Data-Structures/Binary_Tree Data-Structures/Binary_Search_Tree
+VPATH := Data-Structures/Linked_List Data-Structures/Stack_and_Queue Data-Structures/Binary_Tree Data-Structures/Binary_Search_Tree scratch
 
-NAMES  := Q1_A_LL Q2_A_LL Q3_A_LL Q4_A_LL Q5_A_LL Q6_A_LL Q7_A_LL Q1_C_SQ Q2_C_SQ Q3_C_SQ Q4_C_SQ Q5_C_SQ Q6_C_SQ Q7_C_SQ Q1_E_BT Q2_E_BT Q3_E_BT Q4_E_BT Q5_E_BT Q6_E_BT Q7_E_BT Q8_E_BT Q1_F_BST Q2_F_BST Q3_F_BST Q4_F_BST Q5_F_BST
+NAMES  := Q1_A_LL Q2_A_LL Q3_A_LL Q4_A_LL Q5_A_LL Q6_A_LL Q7_A_LL Q1_C_SQ Q2_C_SQ Q3_C_SQ Q4_C_SQ Q5_C_SQ Q6_C_SQ Q7_C_SQ Q1_E_BT Q2_E_BT Q3_E_BT Q4_E_BT Q5_E_BT Q6_E_BT Q7_E_BT Q8_E_BT Q1_F_BST Q2_F_BST Q3_F_BST Q4_F_BST Q5_F_BST play1 play2
 
-RNAMES := r_Q1_A_LL r_Q2_A_LL r_Q3_A_LL r_Q4_A_LL r_Q5_A_LL r_Q6_A_LL r_Q7_A_LL r_Q1_C_SQ r_Q2_C_SQ r_Q3_C_SQ r_Q4_C_SQ r_Q5_C_SQ r_Q6_C_SQ r_Q7_C_SQ r_Q1_E_BT r_Q2_E_BT r_Q3_E_BT r_Q4_E_BT r_Q5_E_BT r_Q6_E_BT r_Q7_E_BT r_Q8_E_BT r_Q1_F_BST r_Q2_F_BST r_Q3_F_BST r_Q4_F_BST r_Q5_F_BST
+RNAMES := r_Q1_A_LL r_Q2_A_LL r_Q3_A_LL r_Q4_A_LL r_Q5_A_LL r_Q6_A_LL r_Q7_A_LL r_Q1_C_SQ r_Q2_C_SQ r_Q3_C_SQ r_Q4_C_SQ r_Q5_C_SQ r_Q6_C_SQ r_Q7_C_SQ r_Q1_E_BT r_Q2_E_BT r_Q3_E_BT r_Q4_E_BT r_Q5_E_BT r_Q6_E_BT r_Q7_E_BT r_Q8_E_BT r_Q1_F_BST r_Q2_F_BST r_Q3_F_BST r_Q4_F_BST r_Q5_F_BST r_play1 r_play2
 
-GNAMES := g_Q1_A_LL g_Q2_A_LL g_Q3_A_LL g_Q4_A_LL g_Q5_A_LL g_Q6_A_LL g_Q7_A_LL g_Q1_C_SQ g_Q2_C_SQ g_Q3_C_SQ g_Q4_C_SQ g_Q5_C_SQ g_Q6_C_SQ g_Q7_C_SQ g_Q1_E_BT g_Q2_E_BT g_Q3_E_BT g_Q4_E_BT g_Q5_E_BT g_Q6_E_BT g_Q7_E_BT g_Q8_E_BT g_Q1_F_BST g_Q2_F_BST g_Q3_F_BST g_Q4_F_BST g_Q5_F_BST
+GNAMES := g_Q1_A_LL g_Q2_A_LL g_Q3_A_LL g_Q4_A_LL g_Q5_A_LL g_Q6_A_LL g_Q7_A_LL g_Q1_C_SQ g_Q2_C_SQ g_Q3_C_SQ g_Q4_C_SQ g_Q5_C_SQ g_Q6_C_SQ g_Q7_C_SQ g_Q1_E_BT g_Q2_E_BT g_Q3_E_BT g_Q4_E_BT g_Q5_E_BT g_Q6_E_BT g_Q7_E_BT g_Q8_E_BT g_Q1_F_BST g_Q2_F_BST g_Q3_F_BST g_Q4_F_BST g_Q5_F_BST g_play1 g_play2
 
-SNAMES := s_Q1_A_LL s_Q2_A_LL s_Q3_A_LL s_Q4_A_LL s_Q5_A_LL s_Q6_A_LL s_Q7_A_LL s_Q1_C_SQ s_Q2_C_SQ s_Q3_C_SQ s_Q4_C_SQ s_Q5_C_SQ s_Q6_C_SQ s_Q7_C_SQ s_Q1_E_BT s_Q2_E_BT s_Q3_E_BT s_Q4_E_BT s_Q5_E_BT s_Q6_E_BT s_Q7_E_BT s_Q8_E_BT s_Q1_F_BST s_Q2_F_BST s_Q3_F_BST s_Q4_F_BST s_Q5_F_BST
+SNAMES := s_Q1_A_LL s_Q2_A_LL s_Q3_A_LL s_Q4_A_LL s_Q5_A_LL s_Q6_A_LL s_Q7_A_LL s_Q1_C_SQ s_Q2_C_SQ s_Q3_C_SQ s_Q4_C_SQ s_Q5_C_SQ s_Q6_C_SQ s_Q7_C_SQ s_Q1_E_BT s_Q2_E_BT s_Q3_E_BT s_Q4_E_BT s_Q5_E_BT s_Q6_E_BT s_Q7_E_BT s_Q8_E_BT s_Q1_F_BST s_Q2_F_BST s_Q3_F_BST s_Q4_F_BST s_Q5_F_BST s_play1 s_play2
 
 LL_LIST  := Q1_A_LL Q2_A_LL Q3_A_LL Q4_A_LL Q5_A_LL Q6_A_LL Q7_A_LL 
 SQ_LIST  := Q1_C_SQ Q2_C_SQ Q3_C_SQ Q4_C_SQ Q5_C_SQ Q6_C_SQ Q7_C_SQ 
 BT_LIST  := Q1_E_BT Q2_E_BT Q3_E_BT Q4_E_BT Q5_E_BT Q6_E_BT Q7_E_BT Q8_E_BT 
 BST_LIST := Q1_F_BST Q2_F_BST Q3_F_BST Q4_F_BST Q5_F_BST 
+PLAY_LIST := play1 play2
 
 .DEFAULT_GOAL := help
 
@@ -67,6 +68,7 @@ help:
 	@printf '  %-20s %s\n' 'Stack_and_Queue'    '$(SQ_LIST)'
 	@printf '  %-20s %s\n' 'Binary_Tree'        '$(BT_LIST)'
 	@printf '  %-20s %s\n' 'Binary_Search_Tree' '$(BST_LIST)'
+	@printf '  %-20s %s\n' 'scratch (연습장)'   '$(PLAY_LIST)'
 	@printf '\n'
 
 .PHONY: help clean $(NAMES) $(RNAMES) $(GNAMES) $(SNAMES)

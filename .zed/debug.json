@@ -1,0 +1,38 @@
+// Zed 디버거 설정. 명령 팔레트에서 `debug: start` 를 실행하면 이 목록이 뜬다.
+//
+// 지금은 진단 단계라서 build 단계를 일부러 뺐다.
+// 실행 전에 터미널에서 먼저 컴파일해 둘 것:  make play1
+//
+// 디버거 자체가 붙는 것을 확인한 뒤에 build 항목을 다시 넣는다.
+[
+  {
+    "label": "play1 (GDB + 자동 빌드)",
+    "adapter": "GDB",
+    "request": "launch",
+    "build": {
+      // command 와 args 를 나누면 Zed 가 args 를 버린다. 한 문자열로 적을 것.
+      "command": "make play1",
+      "cwd": "/home/benjohnbill/dev/krafton-jungle/week04"
+    },
+    "program": "/home/benjohnbill/dev/krafton-jungle/week04/build/play1",
+    "cwd": "/home/benjohnbill/dev/krafton-jungle/week04",
+    "stopAtBeginningOfMainSubprogram": true
+  },
+  {
+    "label": "play1 (GDB, main 에서 자동 정지)",
+    "adapter": "GDB",
+    "request": "launch",
+    "program": "/home/benjohnbill/dev/krafton-jungle/week04/build/play1",
+    "cwd": "/home/benjohnbill/dev/krafton-jungle/week04",
+    "stopAtBeginningOfMainSubprogram": true
+  },
+  {
+    "label": "play1 (CodeLLDB, 터미널 입력)",
+    "adapter": "CodeLLDB",
+    "request": "launch",
+    "program": "/home/benjohnbill/dev/krafton-jungle/week04/build/play1",
+    "cwd": "/home/benjohnbill/dev/krafton-jungle/week04",
+    "terminal": "integrated",
+    "stopOnEntry": true
+  }
+]
