@@ -1,0 +1,1332 @@
+<title>CSAPP 3장 기계어 문제집</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #EEF1F5;
+    --surface: #FFFFFF;
+    --surface-sunk: #E3E8EF;
+    --ink: #16202B;
+    --ink-soft: #5A6673;
+    --ink-faint: #8D97A3;
+    --rule: #CBD3DD;
+    --rule-hard: #16202B;
+    --accent: #B4532A;
+    --accent-soft: #F3E3DA;
+    --struct: #1B3A6B;
+    --ok: #1F6B4E;
+    --ok-soft: #DCEDE5;
+    --no: #A3302B;
+    --no-soft: #F6DFDD;
+    --code-bg: #1A2430;
+    --code-ink: #DDE5EF;
+    --shadow: 0 1px 2px rgba(22,32,43,.07), 0 6px 18px -12px rgba(22,32,43,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E141C;
+      --surface: #18202B;
+      --surface-sunk: #121A24;
+      --ink: #DEE5EE;
+      --ink-soft: #96A2B1;
+      --ink-faint: #6C7887;
+      --rule: #2B3644;
+      --rule-hard: #475060;
+      --accent: #E08A5C;
+      --accent-soft: #33231B;
+      --struct: #8CB0E8;
+      --ok: #62BB94;
+      --ok-soft: #16291F;
+      --no: #E08079;
+      --no-soft: #2C1817;
+      --code-bg: #0A0F16;
+      --code-ink: #CFD9E5;
+      --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 22px -14px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0E141C;
+    --surface: #18202B;
+    --surface-sunk: #121A24;
+    --ink: #DEE5EE;
+    --ink-soft: #96A2B1;
+    --ink-faint: #6C7887;
+    --rule: #2B3644;
+    --rule-hard: #475060;
+    --accent: #E08A5C;
+    --accent-soft: #33231B;
+    --struct: #8CB0E8;
+    --ok: #62BB94;
+    --ok-soft: #16291F;
+    --no: #E08079;
+    --no-soft: #2C1817;
+    --code-bg: #0A0F16;
+    --code-ink: #CFD9E5;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 22px -14px rgba(0,0,0,.9);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding-inline: 20px;
+    padding-block: 0 72px;
+  }
+
+  code, .mono { font-family: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace; }
+
+  .label {
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans KR", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .11em;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  /* ---- masthead ---- */
+  .masthead {
+    border-bottom: 2px solid var(--rule-hard);
+    padding-block: 40px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px 24px;
+  }
+  .masthead h1 {
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans KR", sans-serif;
+    font-weight: 700;
+    font-size: clamp(30px, 6.4vw, 46px);
+    line-height: 1.05;
+    letter-spacing: -.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .masthead h1 span { color: var(--accent); }
+  .masthead .eyebrow { color: var(--ink-soft); margin: 0 0 10px; }
+  .masthead .meta {
+    text-align: right;
+    color: var(--ink-soft);
+    font-size: 12px;
+    line-height: 1.6;
+    font-family: "IBM Plex Mono", monospace;
+  }
+
+  .lede {
+    color: var(--ink-soft);
+    margin: 22px 0 0;
+    max-width: 62ch;
+  }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  /* ---- bit ruler ---- */
+  .ruler {
+    margin-top: 26px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding-block: 6px;
+    display: flex;
+    justify-content: space-between;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: .06em;
+  }
+
+  /* ---- progress ---- */
+  .progress {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--ground);
+    border-bottom: 1px solid var(--rule);
+    padding-block: 10px;
+    margin-block: 0 34px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .progress .bar {
+    flex: 1 1 160px;
+    height: 6px;
+    background: var(--surface-sunk);
+    border-radius: 999px;
+    overflow: hidden;
+    min-width: 120px;
+  }
+  .progress .bar i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width .35s ease;
+  }
+  .progress .count {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .progress button {
+    font: inherit;
+    font-size: 12px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-soft);
+    padding: 3px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .progress button:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ---- section ---- */
+  section.part { margin-bottom: 56px; }
+
+  .part-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    border-bottom: 1px solid var(--rule-hard);
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+  }
+  .part-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: .02em;
+    flex: none;
+  }
+  .part-head h2 {
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans KR", sans-serif;
+    font-weight: 700;
+    font-size: 21px;
+    letter-spacing: -.005em;
+    margin: 0;
+  }
+  .part-head .en {
+    color: var(--ink-faint);
+    font-size: 12px;
+    font-family: "IBM Plex Mono", monospace;
+    margin-left: auto;
+  }
+
+  /* ---- brief (요약 카드) ---- */
+  .brief {
+    background: var(--surface-sunk);
+    border-left: 3px solid var(--struct);
+    padding: 14px 16px;
+    margin-bottom: 22px;
+    font-size: 14px;
+  }
+  .brief .label { color: var(--struct); margin-bottom: 8px; }
+  .brief ul { margin: 0; padding-left: 18px; }
+  .brief li { margin-bottom: 3px; }
+  .brief li:last-child { margin-bottom: 0; }
+  .brief code { font-size: .92em; }
+
+  /* ---- question ---- */
+  .q {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    box-shadow: var(--shadow);
+    padding: 20px 20px 18px;
+    margin-bottom: 18px;
+  }
+  .q-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .q-no {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--surface);
+    background: var(--ink);
+    padding: 1px 7px;
+    flex: none;
+  }
+  .q-kind { color: var(--ink-faint); }
+  .q-done {
+    margin-left: auto;
+    color: var(--ok);
+    font-size: 11px;
+    font-family: "IBM Plex Mono", monospace;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .q.done .q-done { opacity: 1; }
+  .q .stem { margin: 0 0 14px; }
+  .q .stem strong { font-weight: 600; }
+
+  pre.asm {
+    background: var(--code-bg);
+    color: var(--code-ink);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 12px 14px;
+    margin: 0 0 14px;
+    overflow-x: auto;
+    border-left: 3px solid var(--accent);
+  }
+  pre.asm .cm { color: #7D8CA0; }
+
+  /* choices */
+  .choices { display: flex; flex-direction: column; gap: 7px; }
+  .choice {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 9px 12px;
+    cursor: pointer;
+    width: 100%;
+    line-height: 1.6;
+    transition: border-color .15s, background .15s;
+  }
+  .choice:hover:not(:disabled) { border-color: var(--accent); }
+  .choice:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .choice .key {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ink-faint);
+    flex: none;
+    padding-top: 2px;
+  }
+  .choice[data-state="right"] { background: var(--ok-soft); border-color: var(--ok); }
+  .choice[data-state="right"] .key { color: var(--ok); }
+  .choice[data-state="wrong"] { background: var(--no-soft); border-color: var(--no); }
+  .choice[data-state="wrong"] .key { color: var(--no); }
+  .choice[data-state="dim"] { opacity: .5; }
+  .choice:disabled { cursor: default; }
+
+  /* short answer */
+  .short { display: flex; flex-direction: column; gap: 9px; }
+  .short textarea {
+    font: inherit;
+    font-size: 14px;
+    background: var(--surface-sunk);
+    color: var(--ink);
+    border: 1px solid var(--rule);
+    padding: 10px 12px;
+    resize: vertical;
+    min-height: 78px;
+    width: 100%;
+  }
+  .short textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .reveal {
+    font: inherit;
+    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans KR", sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-size: 11px;
+    align-self: flex-start;
+    background: var(--ink);
+    color: var(--ground);
+    border: 1px solid var(--ink);
+    padding: 7px 16px;
+    cursor: pointer;
+  }
+  .reveal:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .reveal:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* explain block */
+  .explain {
+    margin-top: 16px;
+    border-top: 1px dashed var(--rule);
+    padding-top: 14px;
+    display: grid;
+    gap: 14px;
+    font-size: 14px;
+  }
+  .explain[hidden] { display: none !important; }
+  .explain .blk .label { margin-bottom: 4px; }
+  .explain .blk p { margin: 0; }
+  .explain .blk ul { margin: 0; padding-left: 18px; }
+  .ans .label { color: var(--ok); }
+  .ans .verdict {
+    font-family: "IBM Plex Mono", monospace;
+    font-weight: 600;
+    color: var(--ok);
+  }
+  .why .label { color: var(--accent); }
+  .find .label { color: var(--struct); }
+  .use .label { color: var(--ink-faint); }
+  .use {
+    background: var(--surface-sunk);
+    padding: 11px 13px;
+    border-left: 3px solid var(--ink-faint);
+  }
+  .find ul { list-style: none; padding-left: 0; display: grid; gap: 5px; }
+  .find li {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    background: var(--accent-soft);
+    color: var(--ink);
+    padding: 4px 9px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  .wrongs { list-style: none; padding-left: 0; display: grid; gap: 3px; margin-top: 6px; }
+  .wrongs li { color: var(--ink-soft); font-size: 13.5px; }
+  .wrongs li b {
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--no);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
+  .tbl-wrap { overflow-x: auto; margin-bottom: 14px; }
+  table.reg {
+    border-collapse: collapse;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    min-width: 380px;
+  }
+  table.reg th, table.reg td {
+    border: 1px solid var(--rule);
+    padding: 4px 10px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  table.reg th { background: var(--surface-sunk); font-weight: 600; }
+
+  footer.colophon {
+    border-top: 2px solid var(--rule-hard);
+    margin-top: 48px;
+    padding-top: 16px;
+    color: var(--ink-faint);
+    font-size: 12.5px;
+  }
+  footer.colophon p { margin: 0 0 6px; }
+
+  @media (max-width: 520px) {
+    .masthead { flex-direction: column; align-items: flex-start; }
+    .masthead .meta { text-align: left; }
+    .part-head { flex-wrap: wrap; }
+    .part-head .en { margin-left: 0; flex-basis: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="masthead">
+    <div>
+      <p class="label eyebrow">Computer Systems: A Programmer's Perspective · 3판</p>
+      <h1>3장 기계어 수준<br><span>조별 문제집</span></h1>
+    </div>
+    <div class="meta">
+      범위 3.1 – 3.7<br>
+      x86-64 / AT&amp;T 문법<br>
+      문항 12
+    </div>
+  </header>
+
+  <p class="lede">
+    요약본을 옆에 펴 두고 한 문제씩 풀어 보세요. 답을 확인하면 <strong>정답 근거</strong>,
+    <strong>더 찾아볼 검색어</strong>, 그리고 이 사실이 <strong>C 코딩과 gdb, malloc-lab, pintos에서
+    어디에 걸리는지</strong>까지 함께 펼쳐집니다. 시험 대비가 목적이 아니라, 앞으로 우리가 짤 코드가
+    기계에서 어떻게 굴러가는지 배경지식을 쌓는 것이 목적이에요.
+  </p>
+
+  <div class="ruler mono">
+    <span>63</span><span>55</span><span>47</span><span>39</span><span>31</span><span>23</span><span>15</span><span>7</span><span>0</span>
+  </div>
+
+  <div class="progress">
+    <span class="label" style="color:var(--ink-faint)">진행</span>
+    <div class="bar"><i id="bar"></i></div>
+    <span class="count" id="count">0 / 12 확인</span>
+    <button type="button" id="reset">초기화</button>
+  </div>
+
+  <!-- ====================== 3.1 ====================== -->
+  <section class="part">
+    <div class="part-head">
+      <span class="part-num">3.1</span>
+      <h2>역사적 관점</h2>
+      <span class="en">A Historical Perspective</span>
+    </div>
+
+    <div class="brief">
+      <p class="label">한 장 요약</p>
+      <ul>
+        <li>1978년 8086(16비트) → 1985년 386/IA32(32비트) → 2003년 x86-64(64비트).</li>
+        <li>x86은 <b>CISC</b>: 명령어 종류가 많고 길이가 가변이며 주소 지정 방식이 복잡합니다.</li>
+        <li>64비트 확장은 인텔의 IA-64(Itanium)가 아니라 AMD가 만든 x86-64가 표준이 되었습니다.</li>
+        <li>하위 호환성이 이 계열의 가장 큰 자산이자 제약입니다.</li>
+      </ul>
+    </div>
+
+    <article class="q" data-q="1">
+      <div class="q-head">
+        <span class="q-no">01</span>
+        <span class="label q-kind">객관식 · 3.1</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem">x86-64가 64비트 표준으로 자리 잡은 경위를 바르게 설명한 것은 무엇일까요?</p>
+      <div class="choices">
+        <button type="button" class="choice" data-correct="1"><span class="key">A</span><span>인텔은 하위 호환을 버린 새 아키텍처 IA-64(Itanium)로 64비트를 시도했지만, 기존 32비트 코드를 그대로 돌릴 수 있는 AMD의 x86-64가 시장의 선택을 받았고 인텔도 결국 이를 채택했습니다.</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">B</span><span>x86-64로 넘어오면서 명령어 길이가 모두 4바이트로 고정되어 RISC 설계로 전환되었습니다.</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">C</span><span>x86-64 프로세서는 이전 세대의 16비트·32비트 코드를 더 이상 실행할 수 없습니다.</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">D</span><span>IA-64가 기존 x86 명령어를 그대로 실행할 수 있었기 때문에 지금도 서버 시장의 표준으로 쓰입니다.</span></button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">정답</p>
+          <p><span class="verdict">A</span> — 하위 호환을 유지한 쪽이 이겼습니다.</p>
+          <ul class="wrongs">
+            <li><b>B</b> x86-64는 여전히 CISC입니다. 명령어 길이는 1바이트부터 15바이트까지 가변이에요.</li>
+            <li><b>C</b> 반대입니다. 하위 호환성이야말로 이 계열이 40년 넘게 살아남은 이유입니다.</li>
+            <li><b>D</b> IA-64는 명령어 집합 자체가 달랐고, x86 호환은 느린 에뮬레이션뿐이라 기존 코드를 쓰던 시장이 따라오지 않았습니다.</li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p>새 아키텍처가 아무리 우수해도 이미 쌓인 소프트웨어 자산을 버리게 만들면 시장이 따라오지 않습니다.
+          AMD는 기존 명령어를 그대로 두고 레지스터를 8개에서 16개로 늘리고 폭을 64비트로 넓히는 <b>확장</b>을 택했고,
+          그래서 오늘날 우리가 보는 어셈블리에는 <code>%rax</code>와 <code>%eax</code>, <code>%ax</code>, <code>%al</code>이
+          한 레지스터의 서로 다른 조각으로 공존합니다.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>why did AMD64 win over Intel Itanium IA-64</li>
+            <li>x86-64 variable length instruction encoding CISC</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>gdb로 <code>disas</code>를 떠 보면 같은 함수 안에 <code>%rax</code>와 <code>%eax</code>가 섞여 나옵니다.
+          이게 서로 다른 레지스터가 아니라 같은 레지스터의 64비트/32비트 이름이라는 사실을 모르면
+          어셈블리를 읽을 때마다 막힙니다.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ====================== 3.2 ====================== -->
+  <section class="part">
+    <div class="part-head">
+      <span class="part-num">3.2</span>
+      <h2>프로그램 인코딩</h2>
+      <span class="en">Program Encodings</span>
+    </div>
+
+    <div class="brief">
+      <p class="label">한 장 요약</p>
+      <ul>
+        <li>파이프라인: <code>cpp</code>(.c→.i) → <code>cc1</code>(.i→.s) → <code>as</code>(.s→.o) → <code>ld</code>(.o+라이브러리→실행파일).</li>
+        <li>두 가지 핵심 추상화는 <b>ISA</b>(명령어 집합 구조)와 <b>가상 주소 공간</b>입니다.</li>
+        <li>ISA는 "한 번에 한 명령어씩 순서대로" 실행되는 것처럼 보이도록 보장합니다.</li>
+        <li>CS:APP의 기본 최적화 옵션은 <code>-Og</code>입니다. 원본 코드 구조를 최대한 유지해요.</li>
+      </ul>
+    </div>
+
+    <article class="q" data-q="2">
+      <div class="q-head">
+        <span class="q-no">02</span>
+        <span class="label q-kind">객관식 · 3.2</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem"><code>hello.c</code> 한 개를 실행 파일로 만드는 과정에서, <b>어셈블리 파일 <code>hello.s</code>를 기계어 오브젝트 <code>hello.o</code>로 바꾸는</b> 단계의 도구는 무엇일까요?</p>
+      <div class="choices">
+        <button type="button" class="choice" data-correct="0"><span class="key">A</span><span>전처리기 <code>cpp</code></span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">B</span><span>컴파일러 <code>cc1</code></span></button>
+        <button type="button" class="choice" data-correct="1"><span class="key">C</span><span>어셈블러 <code>as</code></span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">D</span><span>링커 <code>ld</code></span></button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">정답</p>
+          <p><span class="verdict">C</span> — 어셈블러 <code>as</code>가 사람이 읽는 어셈블리를 이진 오브젝트 코드로 바꿉니다.</p>
+          <ul class="wrongs">
+            <li><b>A</b> <code>cpp</code>는 <code>#include</code>와 <code>#define</code>을 펼쳐 <code>.i</code>를 만듭니다.</li>
+            <li><b>B</b> <code>cc1</code>은 <code>.i</code>를 어셈블리 <code>.s</code>로 바꿉니다. 한 단계 앞이에요.</li>
+            <li><b>D</b> <code>ld</code>는 여러 <code>.o</code>와 라이브러리를 묶어 주소를 확정합니다. 한 단계 뒤예요.</li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p><code>.o</code> 단계의 기계어는 아직 <b>주소가 확정되지 않은</b> 상태입니다.
+          <code>printf</code>를 부르는 <code>call</code> 명령의 목적지 주소는 링커가 라이브러리를 결합하면서
+          비로소 채워집니다. 그래서 <code>objdump -dr hello.o</code>로 떠 보면 <code>call</code>의 4바이트 변위가
+          <code>00 00 00 00</code>으로 비어 있고, 그 옆에 <code>R_X86_64_PLT32 printf</code>라는
+          재배치 항목이 붙어 있습니다. 링커가 이 빈칸을 채워요.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>gcc -E -S -c options what each stage produces</li>
+            <li>objdump -dr relocation entries R_X86_64_PLT32</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>"undefined reference to ..." 오류는 컴파일 오류가 아니라 <b>링크 오류</b>입니다.
+          단계를 구분할 줄 알면 이 메시지를 보자마자 소스가 아니라 링크 명령을 봐야 한다는 걸 압니다.
+          우리 <code>Makefile</code>은 <code>.c</code> 하나를 곧장 실행 파일로 만들지만,
+          malloc-lab과 pintos의 <code>Makefile</code>은 파일마다 <code>.o</code>를 따로 만든 뒤 마지막에 링크합니다.
+          한 파일만 고치면 그 파일만 다시 컴파일하고 링크만 새로 하면 되고,
+          <code>undefined reference</code>는 그 마지막 단계에서만 나와요.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="q" data-q="3">
+      <div class="q-head">
+        <span class="q-no">03</span>
+        <span class="label q-kind">단답 · 3.2</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem">ISA는 프로그램이 "한 번에 한 명령어씩 순서대로" 실행되는 것처럼 보이도록 보장합니다.
+      그런데 실제 하드웨어는 그렇게 동작하지 않아요. <b>실제 하드웨어는 어떻게 다르며, 그럼에도 이 추상화가 깨지지 않는 이유는 무엇일까요?</b></p>
+      <div class="short">
+        <label class="label" for="a3" style="color:var(--ink-faint)">내 답</label>
+        <textarea id="a3" placeholder="두세 문장으로 적어 보세요."></textarea>
+        <button type="button" class="reveal">모범 답안 보기</button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">모범 답안</p>
+          <p>실제 프로세서는 파이프라이닝, 비순차 실행(out-of-order), 분기 예측과 추측 실행을 통해
+          여러 명령어를 동시에 겹쳐 처리하고, 순서를 바꿔 실행하기도 합니다.
+          다만 그 <b>결과가 순차 실행한 것과 동일하도록</b> 하드웨어가 보장하기 때문에,
+          프로그래머가 보는 ISA 모델은 깨지지 않습니다.</p>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p>ISA는 하드웨어와 소프트웨어 사이의 계약입니다. 계약이 정하는 것은
+          <b>어떤 순서로 실행하는가</b>가 아니라 <b>무엇이 관찰되는가</b>예요.
+          그래서 CPU 제조사는 계약을 지키는 한도 안에서 내부 구현을 자유롭게 바꿀 수 있고,
+          같은 바이너리가 10년 전 CPU와 오늘 CPU에서 모두 돕니다.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>out-of-order execution sequential semantics guarantee</li>
+            <li>ISA as hardware software contract CSAPP 3.2.1</li>
+            <li>pintos timer interrupt preemption race condition count++</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>이 보장은 <b>명령 흐름 하나 안에서만</b> 유효합니다.
+          pintos에서 스레드가 둘 이상이 되면, 타이머 인터럽트가 명령과 명령 사이 아무 데나 끼어들어
+          두 스레드의 명령 흐름이 서로 섞입니다. 그래서 <code>count++</code> 같은
+          읽고-고치고-쓰는 연산이 중간에 끊길 수 있고, 락이 필요해지는 것도 이 때문이에요.
+          즉 ISA가 보장하는 것은 "한 흐름 안에서의 순서"이지, "두 흐름이 섞이지 않는 것"이 아닙니다.
+          이 둘을 구분해 두면 그 시점에 헤매지 않아요.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ====================== 3.3 ====================== -->
+  <section class="part">
+    <div class="part-head">
+      <span class="part-num">3.3</span>
+      <h2>데이터 형식</h2>
+      <span class="en">Data Formats</span>
+    </div>
+
+    <div class="brief">
+      <p class="label">한 장 요약</p>
+      <div class="tbl-wrap">
+        <table class="reg">
+          <tr><th>C 선언</th><th>Intel 용어</th><th>접미사</th><th>크기</th></tr>
+          <tr><td>char</td><td>Byte</td><td>b</td><td>1</td></tr>
+          <tr><td>short</td><td>Word</td><td>w</td><td>2</td></tr>
+          <tr><td>int</td><td>Double Word</td><td>l</td><td>4</td></tr>
+          <tr><td>long / 포인터</td><td>Quad Word</td><td>q</td><td>8</td></tr>
+          <tr><td>float</td><td>Single Precision</td><td>s</td><td>4</td></tr>
+          <tr><td>double</td><td>Double Precision</td><td>l (sd)</td><td>8</td></tr>
+        </table>
+      </div>
+      <ul>
+        <li>인텔이 "word"라고 부르는 것은 <b>2바이트</b>입니다. 흔히 말하는 워드와 다르니 주의하세요.</li>
+      </ul>
+    </div>
+
+    <article class="q" data-q="4">
+      <div class="q-head">
+        <span class="q-no">04</span>
+        <span class="label q-kind">객관식 · 3.3</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem">C 타입과 어셈블리 접미사, 크기의 대응 중 <b>틀린</b> 것은 무엇일까요?</p>
+      <div class="choices">
+        <button type="button" class="choice" data-correct="0"><span class="key">A</span><span><code>char</code> → 접미사 <code>b</code>, 1바이트</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">B</span><span><code>short</code> → 접미사 <code>w</code>, 2바이트</span></button>
+        <button type="button" class="choice" data-correct="1"><span class="key">C</span><span><code>int</code> → 접미사 <code>q</code>, 8바이트</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">D</span><span><code>char *</code> → 접미사 <code>q</code>, 8바이트</span></button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">정답</p>
+          <p><span class="verdict">C</span> — <code>int</code>는 x86-64에서도 여전히 <b>4바이트</b>이고 접미사는 <code>l</code>입니다.</p>
+          <ul class="wrongs">
+            <li><b>A · B · D</b> 모두 맞습니다. 특히 D처럼 포인터는 <b>타입과 무관하게 항상 8바이트</b>예요.</li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p>64비트로 넘어오면서 커진 것은 <code>long</code>과 포인터이지 <code>int</code>가 아닙니다.
+          리눅스/gcc가 쓰는 모델을 <b>LP64</b>라고 부르는데, Long과 Pointer만 64비트라는 뜻이에요.
+          그래서 <code>int</code>에 포인터를 담으면 상위 32비트가 잘려 나갑니다.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>LP64 vs LLP64 data model int long pointer size</li>
+            <li>x86-64 assembly suffix b w l q meaning</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>malloc-lab에서 블록 헤더 크기를 잡을 때 이 표가 그대로 쓰입니다.
+          우리가 <code>size_t</code>(8바이트)와 <code>int</code>(4바이트)를 섞어 쓰면 헤더 오프셋이 어긋나고,
+          그 버그는 한참 뒤 엉뚱한 곳에서 터져요.
+          연결 리스트 과제의 <code>sizeof(ListNode)</code>를 이 표로 계산하면 4 + 8 = 12인데, 실제로는 16이 나옵니다.
+          나머지 4바이트가 어디서 왔는지는 3.9(정렬)에서 풀려요.
+          지금은 "이 표는 필드 하나하나의 크기까지만 말해 준다"는 것만 기억해 두세요.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ====================== 3.4 ====================== -->
+  <section class="part">
+    <div class="part-head">
+      <span class="part-num">3.4</span>
+      <h2>정보 접근</h2>
+      <span class="en">Accessing Information</span>
+    </div>
+
+    <div class="brief">
+      <p class="label">한 장 요약</p>
+      <ul>
+        <li>범용 레지스터 16개. 각각 64/32/16/8비트 이름이 있습니다(<code>%rax</code>/<code>%eax</code>/<code>%ax</code>/<code>%al</code>).</li>
+        <li><b>규칙</b>: 4바이트(<code>l</code>) 연산은 상위 4바이트를 <b>0으로 채웁니다</b>. 1·2바이트 연산은 나머지를 그대로 둡니다.</li>
+        <li>가장 일반적인 메모리 참조 형식: <code>Imm(rb, ri, s)</code> → 유효 주소 = <code>Imm + R[rb] + R[ri] × s</code>, 스케일 <code>s</code>는 1·2·4·8만 가능.</li>
+        <li>메모리에서 메모리로 직접 옮기는 <code>mov</code>는 없습니다. 반드시 레지스터를 거쳐야 해요.</li>
+        <li>스택은 <b>높은 주소에서 낮은 주소로</b> 자라고 <code>%rsp</code>가 꼭대기를 가리킵니다.</li>
+      </ul>
+    </div>
+
+    <article class="q" data-q="5">
+      <div class="q-head">
+        <span class="q-no">05</span>
+        <span class="label q-kind">단답 · 3.4</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem">다음 한 줄을 읽고 세 가지에 답해 보세요.
+      ① 읽어 오는 <b>유효 주소</b>를 수식으로 쓰기, ② 몇 바이트를 읽는지, ③ 실행 후 <code>%rax</code>의 <b>상위 4바이트</b>는 어떻게 되는지.</p>
+      <pre class="asm">movl  (%rdx,%rcx,4), %eax     <span class="cm"># %rdx, %rcx 에는 어떤 값이 들어 있다고 가정</span></pre>
+      <div class="short">
+        <label class="label" for="a5" style="color:var(--ink-faint)">내 답</label>
+        <textarea id="a5" placeholder="① 주소 = ...  ② ...바이트  ③ 상위 4바이트는 ..."></textarea>
+        <button type="button" class="reveal">모범 답안 보기</button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">모범 답안</p>
+          <ul>
+            <li>① 유효 주소 = <code>R[%rdx] + R[%rcx] × 4</code>. 변위(Imm)가 없으므로 0으로 봅니다.</li>
+            <li>② 접미사가 <code>l</code>이므로 그 주소에서 <b>4바이트</b>를 읽습니다.</li>
+            <li>③ <code>%rax</code>의 상위 4바이트는 <b>0으로 채워집니다</b>. 목적지가 32비트 레지스터이기 때문이에요.</li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p>스케일 4는 원소 크기가 4바이트라는 뜻이니, 이 한 줄은 사실상 <code>int</code> 배열의
+          <code>a[i]</code>를 읽는 C 코드가 번역된 결과입니다. <code>%rdx</code>가 배열의 시작 주소,
+          <code>%rcx</code>가 인덱스예요.</p>
+          <p>③은 x86-64에서 새로 도입된 관례입니다. 32비트 목적지로 쓰면 상위가 0이 되므로
+          <code>movzlq</code> 같은 명령어가 아예 필요 없어요. 반대로 <code>movb</code>나 <code>movw</code>는
+          나머지 바이트를 <b>건드리지 않습니다</b>. 이 비대칭이 어셈블리를 읽을 때 자주 헷갈리는 자리예요.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>x86-64 effective address Imm(base,index,scale) formula</li>
+            <li>why does writing to eax zero the upper 32 bits of rax</li>
+            <li>gdb x/4xw examine memory array</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>C에서 <code>a[i]</code>라고 쓰는 순간 기계는 <b>주소 산술</b>을 합니다.
+          malloc-lab에서 <code>(char *)bp + size</code>처럼 포인터를 옮길 때
+          <code>char *</code>로 캐스팅하는 이유가 바로 이 스케일 때문이에요.
+          <code>int *</code>에 4를 더하면 16바이트가 움직입니다.
+          gdb에서 <code>x/4xw $rdx</code>로 그 자리를 직접 들여다보면 이 대응이 눈에 보여요.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="q" data-q="6">
+      <div class="q-head">
+        <span class="q-no">06</span>
+        <span class="label q-kind">객관식 · 3.4</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem"><code>pushq %rax</code> 한 줄과 정확히 같은 일을 하는 것은 무엇일까요?</p>
+      <div class="choices">
+        <button type="button" class="choice" data-correct="0"><span class="key">A</span><span><code>addq $8, %rsp</code> 다음 <code>movq %rax, (%rsp)</code></span></button>
+        <button type="button" class="choice" data-correct="1"><span class="key">B</span><span><code>subq $8, %rsp</code> 다음 <code>movq %rax, (%rsp)</code></span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">C</span><span><code>movq %rax, (%rsp)</code> 다음 <code>subq $8, %rsp</code></span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">D</span><span><code>movq (%rsp), %rax</code> 다음 <code>addq $8, %rsp</code></span></button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">정답</p>
+          <p><span class="verdict">B</span> — 먼저 <code>%rsp</code>를 8만큼 <b>빼서</b> 자리를 만들고, 그 자리에 값을 씁니다.</p>
+          <ul class="wrongs">
+            <li><b>A</b> 방향이 반대입니다. 더하면 스택이 줄어들어요(pop 쪽).</li>
+            <li><b>C</b> 순서가 반대라 아직 남의 자리인 곳에 먼저 쓰게 됩니다.</li>
+            <li><b>D</b> 이건 <code>popq %rax</code>입니다.</li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p>스택은 높은 주소에서 낮은 주소로 자랍니다. 그래서 "쌓는다"는 말과 달리
+          주소는 <b>줄어듭니다</b>. <code>%rsp</code>는 항상 마지막으로 쌓은 값을 가리키므로,
+          새 값을 넣으려면 먼저 포인터를 내려 빈 자리를 확보한 다음 써야 해요.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>x86-64 stack grows downward push pop equivalent instructions</li>
+            <li>gdb info frame rsp rbp stack layout</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>스택이 아래로 자란다는 사실이 3.10의 버퍼 오버플로우로 이어집니다.
+          지역 배열은 낮은 주소에 놓이고 리턴 주소는 그보다 <b>위</b>에 있으니,
+          배열 끝을 넘어 쓰면 리턴 주소를 덮게 돼요(다음 범위에서 다룹니다).</p>
+          <p>pintos에서는 이 그림이 더 구체적으로 보입니다. 스레드마다 4KB 페이지를 하나 잡고,
+          페이지 아래쪽에 <code>struct thread</code>를, 위쪽 끝에서 아래로 커널 스택을 둬요.
+          그래서 스택이 너무 자라면 <code>struct thread</code>의 <code>magic</code> 필드를 덮어
+          <code>is_thread()</code> 검사에 걸립니다. 커널 코드에서 지역 배열을 크게 잡으면 안 되는 이유가 이것이에요.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ====================== 3.5 ====================== -->
+  <section class="part">
+    <div class="part-head">
+      <span class="part-num">3.5</span>
+      <h2>산술 · 논리 연산</h2>
+      <span class="en">Arithmetic and Logical Operations</span>
+    </div>
+
+    <div class="brief">
+      <p class="label">한 장 요약</p>
+      <ul>
+        <li><code>leaq</code>는 메모리 참조 <b>형태</b>를 쓰지만 메모리를 읽지 않고, 계산된 <b>주소 값 자체</b>를 저장합니다. 조건 코드도 바꾸지 않아요.</li>
+        <li>단항 <code>inc dec neg not</code>, 이항 <code>add sub imul xor or and</code>, 시프트 <code>sal/shl sar shr</code>.</li>
+        <li><code>sar</code>는 산술 시프트(부호 유지), <code>shr</code>는 논리 시프트(0 채움)입니다.</li>
+        <li>64비트 곱셈의 128비트 결과는 <code>%rdx:%rax</code> 쌍에 담깁니다. 부호 있는 나눗셈(<code>idivq</code>) 전에는 <code>cqto</code>로 <code>%rdx:%rax</code>를 부호 확장하고, 부호 없는 나눗셈(<code>divq</code>) 전에는 <code>%rdx</code>를 0으로 비웁니다.</li>
+      </ul>
+    </div>
+
+    <article class="q" data-q="7">
+      <div class="q-head">
+        <span class="q-no">07</span>
+        <span class="label q-kind">단답 · 3.5</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem">다음 두 줄은 겉모습이 거의 같습니다. <b>각각 <code>%rax</code>에 무엇이 들어가는지</b>,
+      그리고 <b>메모리를 읽는 쪽은 어느 줄인지</b> 답해 보세요.</p>
+      <pre class="asm">leaq  (%rdi,%rdi,4), %rax     <span class="cm"># ①</span>
+movq  (%rdi,%rdi,4), %rax     <span class="cm"># ②</span></pre>
+      <div class="short">
+        <label class="label" for="a7" style="color:var(--ink-faint)">내 답</label>
+        <textarea id="a7" placeholder="① %rax = ...   ② %rax = ...   메모리를 읽는 쪽은 ..."></textarea>
+        <button type="button" class="reveal">모범 답안 보기</button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">모범 답안</p>
+          <ul>
+            <li>① <code>%rax = %rdi + %rdi × 4 = %rdi × 5</code>. <b>주소 계산 결과인 숫자 자체</b>가 들어갑니다. 메모리는 건드리지 않아요.</li>
+            <li>② <code>%rdi + %rdi × 4</code>를 <b>주소로 삼아</b> 그 자리의 8바이트를 읽어 옵니다.</li>
+            <li>메모리를 읽는 쪽은 ②뿐입니다.</li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p><code>leaq</code>는 이름이 Load Effective Address라서 "적재"처럼 들리지만,
+          적재하는 것은 <b>주소</b>이지 그 주소의 내용이 아닙니다.
+          주소 계산 회로가 덧셈과 1·2·4·8배 곱셈을 한 번에 해 주므로,
+          컴파일러는 이걸 <b>빠른 정수 산술기</b>로 전용해서 씁니다.
+          <code>x*5</code>, <code>5*x+7</code> 같은 식이 곱셈 명령 없이 <code>leaq</code> 한 줄로 끝나는 이유예요.
+          게다가 조건 코드를 건드리지 않아서 비교 결과를 살려 둔 채 계산을 끼워 넣을 수도 있습니다.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>lea vs mov x86 difference does not access memory</li>
+            <li>compiler uses leaq for integer multiplication optimization</li>
+            <li>why leaq does not set condition codes</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>C에서 <code>&amp;a[i]</code>와 <code>a[i]</code>의 차이가 정확히 ①과 ②의 차이입니다.
+          malloc-lab에서 <code>HDRP(bp)</code>는 <code>bp - 4</code>라는 주소 계산만 하니 ①에 해당합니다.
+          반면 <code>NEXT_BLKP(bp)</code>는 헤더에서 크기를 <b>읽은 뒤</b>(<code>GET_SIZE</code>) 더하므로 ②가 먼저 일어나고 덧셈이 뒤따라요.
+          두 매크로가 겉보기에 비슷한데 한쪽만 메모리를 건드린다는 점을 구분해 두면,
+          헤더가 깨졌을 때 어느 자리에서 쓰레기 값이 들어왔는지 gdb에서 바로 짚을 수 있습니다.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ====================== 3.6 ====================== -->
+  <section class="part">
+    <div class="part-head">
+      <span class="part-num">3.6</span>
+      <h2>제어</h2>
+      <span class="en">Control</span>
+    </div>
+
+    <div class="brief">
+      <p class="label">한 장 요약</p>
+      <ul>
+        <li>조건 코드 4개: <b>CF</b>(부호 없는 자리올림), <b>ZF</b>(결과가 0), <b>SF</b>(결과가 음수), <b>OF</b>(부호 있는 오버플로우).</li>
+        <li><code>cmp S1, S2</code>는 내부적으로 <b><code>S2 - S1</code></b>을 계산하고 플래그만 남깁니다. 피연산자 순서가 뒤집힌 것처럼 보여요.</li>
+        <li><code>test S1, S2</code>는 <code>S1 &amp; S2</code>. <code>testq %rax, %rax</code>는 0인지 음수인지 검사하는 관용구입니다.</li>
+        <li>분기 구현은 두 갈래: <b>점프</b>(<code>jle</code> 등)와 <b>조건부 이동</b>(<code>cmov</code>).</li>
+        <li>case가 조밀하면 <code>switch</code>는 점프 테이블로 O(1) 분기가 됩니다.</li>
+      </ul>
+    </div>
+
+    <article class="q" data-q="8">
+      <div class="q-head">
+        <span class="q-no">08</span>
+        <span class="label q-kind">객관식 · 3.6</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem">다음 코드에서 <code>.L2</code>로 점프하는 조건은 무엇일까요?</p>
+      <pre class="asm">cmpq  %rsi, %rdi
+jle   .L2</pre>
+      <div class="choices">
+        <button type="button" class="choice" data-correct="0"><span class="key">A</span><span><code>%rsi &lt;= %rdi</code> 일 때</span></button>
+        <button type="button" class="choice" data-correct="1"><span class="key">B</span><span><code>%rdi &lt;= %rsi</code> 일 때</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">C</span><span><code>%rdi - %rsi</code> 의 결과가 0일 때만</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">D</span><span>두 값의 부호가 서로 다를 때</span></button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">정답</p>
+          <p><span class="verdict">B</span> — <code>%rdi &lt;= %rsi</code> 일 때 점프합니다.</p>
+          <ul class="wrongs">
+            <li><b>A</b> 가장 흔한 함정입니다. 쓰인 순서대로 읽으면 이렇게 되는데, AT&amp;T 문법에서는 뒤집어 읽어야 해요.</li>
+            <li><b>C</b> 그건 <code>je</code>(ZF)입니다. <code>jle</code>는 같거나 작을 때 모두 점프해요.</li>
+            <li><b>D</b> 부호 비교는 <code>SF ^ OF</code> 조합으로 판정되지만, 부호가 다르다는 것 자체가 조건은 아닙니다.</li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p>AT&amp;T 문법의 <code>cmpq S1, S2</code>는 <b><code>S2 - S1</code></b>을 계산합니다.
+          즉 <code>cmpq %rsi, %rdi</code>는 <code>%rdi - %rsi</code>를 계산하고,
+          이어지는 <code>jle</code>는 그 <b>뺄셈 결과가 0 이하</b>일 때 점프하니
+          <code>%rdi &lt;= %rsi</code>가 됩니다. C로 옮기면
+          <code>if (a &gt; b) { ... }</code>에서 조건이 거짓일 때 본문을 건너뛰는 전형적인 모양이에요.</p>
+          <p>참고로 <code>jle</code>의 판정식은 <code>(SF ^ OF) | ZF</code>이고, 이건 <b>부호 있는</b> 비교입니다.
+          부호 없는 비교는 <code>jbe</code>, <code>ja</code>처럼 다른 이름을 씁니다.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>AT&amp;T syntax cmp operand order reversed intel syntax</li>
+            <li>x86 jle jbe signed vs unsigned jump conditions table</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>gdb에서 <code>disas</code>를 뜨는 순간 이 함정을 매번 만납니다.
+          부등호를 거꾸로 읽으면 조건문 분석이 통째로 뒤집혀요.
+          또 하나, 부호 있는 점프(<code>jle</code>)가 나왔는지 부호 없는 점프(<code>jbe</code>)가 나왔는지를 보면
+          그 변수가 <code>int</code>인지 <code>unsigned</code>인지 역으로 알 수 있습니다.
+          malloc-lab에서 <code>size_t</code>(부호 없음) 비교를 잘못 짜서 음수가 거대한 양수로 둔갑하는 버그가
+          바로 이 구분에서 나와요.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="q" data-q="9">
+      <div class="q-head">
+        <span class="q-no">09</span>
+        <span class="label q-kind">객관식 · 3.6</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem"><code>cmov</code>(조건부 이동)는 분기 예측 실패 비용이 없어서 빠릅니다.
+      그런데도 컴파일러가 <b><code>cmov</code>를 쓰지 못하고 점프를 쓰는</b> 대표적인 이유는 무엇일까요?</p>
+      <div class="choices">
+        <button type="button" class="choice" data-correct="0"><span class="key">A</span><span><code>cmov</code>는 64비트 레지스터에는 쓸 수 없기 때문입니다.</span></button>
+        <button type="button" class="choice" data-correct="1"><span class="key">B</span><span><code>cmov</code>는 <b>양쪽 분기를 모두 계산한 뒤</b> 고르므로, 한쪽이 널 포인터 역참조처럼 위험하거나 부작용이 있으면 쓸 수 없습니다.</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">C</span><span><code>cmov</code>는 조건 코드를 설정하지 못해서 뒤에 이어지는 비교가 깨지기 때문입니다.</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">D</span><span><code>cmov</code>는 <code>-O2</code> 이상에서만 쓸 수 있는 명령어이기 때문입니다.</span></button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">정답</p>
+          <p><span class="verdict">B</span> — 양쪽을 다 계산해야 한다는 점이 <code>cmov</code>의 본질적 제약입니다.</p>
+          <ul class="wrongs">
+            <li><b>A</b> <code>cmovq</code>처럼 64비트 형태가 있습니다.</li>
+            <li><b>C</b> 조건 코드를 <b>읽는</b> 명령어지 설정하는 명령어가 아니며, 이게 문제가 되지도 않습니다.</li>
+            <li><b>D</b> 최적화 수준은 컴파일러의 선택 문제이지 명령어의 사용 가능 여부와 무관합니다.</li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p><code>if (p &amp;&amp; *p &gt; 0)</code> 같은 코드를 <code>cmov</code>로 바꾸면
+          <code>p</code>가 널이어도 <code>*p</code>를 먼저 읽게 되어 프로그램이 죽습니다.
+          함수 호출이나 메모리 쓰기처럼 부작용이 있는 경우도 마찬가지예요.
+          계산 비용이 큰 쪽이 섞여 있으면 성능 면에서도 손해라서, 컴파일러는 그런 자리에 점프를 남겨 둡니다.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>cmov branchless why compiler still emits branches side effects</li>
+            <li>branch misprediction penalty pipeline flush cost</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>최적화를 켜면 소스의 <code>if</code>가 어셈블리에서 사라져 gdb의 한 줄 실행이 코드 순서대로 움직이지 않습니다.
+          CS:APP이 <code>-Og</code>를 기본으로 쓰는 이유가 여기에 있어요.
+          우리 <code>Makefile</code>은 한 단계 더 내려 <code>-g -O0</code>으로 빌드하는데, 그러면 소스 한 줄이
+          어셈블리 한 덩어리에 그대로 대응해서 gdb의 <code>next</code>가 소스 순서대로 움직입니다.
+          최적화를 켠 바이너리에서 <code>next</code>가 줄을 건너뛰거나 변수가 <code>&lt;optimized out&gt;</code>으로 보이면,
+          이 문제의 <code>cmov</code>처럼 분기 자체가 사라진 것이에요.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ====================== 3.7 ====================== -->
+  <section class="part">
+    <div class="part-head">
+      <span class="part-num">3.7</span>
+      <h2>프로시저</h2>
+      <span class="en">Procedures</span>
+    </div>
+
+    <div class="brief">
+      <p class="label">한 장 요약</p>
+      <div class="tbl-wrap">
+        <table class="reg">
+          <tr><th>인자</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9~</th></tr>
+          <tr><th>정수·포인터</th><td>%rdi</td><td>%rsi</td><td>%rdx</td><td>%rcx</td><td>%r8</td><td>%r9</td><td>스택</td><td>스택</td><td>스택</td></tr>
+          <tr><th>부동소수점</th><td>%xmm0</td><td>%xmm1</td><td>%xmm2</td><td>%xmm3</td><td>%xmm4</td><td>%xmm5</td><td>%xmm6</td><td>%xmm7</td><td>스택</td></tr>
+        </table>
+      </div>
+      <ul>
+        <li><code>call</code>은 리턴 주소를 push한 뒤 점프하고, <code>ret</code>은 pop한 뒤 그리로 돌아갑니다.</li>
+        <li>리턴값: 정수·포인터는 <code>%rax</code>, 실수는 <code>%xmm0</code>.</li>
+        <li><b>Callee-saved</b>: <code>%rbx %rbp %r12~%r15</code> — 쓰려면 진입할 때 저장하고 나갈 때 복원해야 합니다.</li>
+        <li><b>Caller-saved</b>: <code>%rax %rdi %rsi %rdx %rcx %r8~%r11</code> — 호출된 함수가 마음대로 덮어써도 됩니다.</li>
+        <li>정수 인자와 실수 인자는 <b>서로 독립적으로</b> 번호를 셉니다.</li>
+        <li>지역 변수는 되도록 레지스터에 둡니다. 레지스터가 모자라거나, 배열·구조체이거나, <code>&amp;</code>로 <b>주소를 취해야 하면</b> 스택에 놓여요.</li>
+        <li>재귀는 특별한 장치 없이 됩니다. 호출마다 자기만의 스택 프레임이 생기기 때문이에요.</li>
+        <li><b>한도가 서로 다릅니다.</b> 정수·포인터는 6개(<code>%rdi</code>~<code>%r9</code>)까지, 부동소수점은 8개(<code>%xmm0</code>~<code>%xmm7</code>)까지 레지스터로 넘기고, 넘치는 것만 스택으로 갑니다.</li>
+      </ul>
+    </div>
+
+    <article class="q" data-q="10">
+      <div class="q-head">
+        <span class="q-no">10</span>
+        <span class="label q-kind">단답 · 3.7</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem">다음 함수를 호출할 때 <code>a</code>, <code>b</code>, <code>c</code>는 각각 <b>어느 레지스터</b>에 실릴까요?
+      그리고 리턴값은 어디에 담길까요?</p>
+      <pre class="asm">double f(int a, double b, int c);</pre>
+      <div class="short">
+        <label class="label" for="a10" style="color:var(--ink-faint)">내 답</label>
+        <textarea id="a10" placeholder="a = ...   b = ...   c = ...   리턴값 = ..."></textarea>
+        <button type="button" class="reveal">모범 답안 보기</button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">모범 답안</p>
+          <ul>
+            <li><code>a</code> (int) → <code>%edi</code> — 정수 계열 <b>첫 번째</b></li>
+            <li><code>b</code> (double) → <code>%xmm0</code> — 실수 계열 <b>첫 번째</b></li>
+            <li><code>c</code> (int) → <code>%esi</code> — 정수 계열 <b>두 번째</b></li>
+            <li>리턴값은 <code>double</code>이므로 <code>%xmm0</code></li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p>흔히 틀리는 지점이 <code>c</code>입니다. 인자 목록에서 세 번째라고 <code>%rdx</code>에 실릴 것 같지만,
+          정수 계열과 실수 계열이 <b>각자 따로</b> 번호를 세기 때문에 <code>c</code>는 정수 중 두 번째가 되어
+          <code>%rsi</code>로 갑니다. <code>int</code>는 4바이트라서 32비트 이름 <code>%edi</code>, <code>%esi</code>로 쓰였어요.</p>
+          <p>이 규약의 정식 이름은 <b>System V AMD64 ABI</b>입니다. 리눅스와 macOS가 이걸 따르고,
+          윈도우는 다른 규약(<code>%rcx</code>부터 시작)을 씁니다.
+          참고로 책에서 부동소수점 인자 전달은 3.7이 아니라 <b>3.11.4</b>에 나와요. 원문을 찾을 때 헤매지 마세요.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>System V AMD64 ABI argument passing registers integer vs SSE class</li>
+            <li>gdb info registers rdi rsi inspect function arguments at breakpoint</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>gdb에서 함수 진입점에 브레이크를 걸고 <code>info registers rdi rsi</code>를 치면
+          디버그 정보 없이도 인자를 볼 수 있습니다. 라이브러리 함수를 파고들 때 특히 유용해요.
+          pintos의 시스템 콜도 같은 그림 위에 있지만 한 칸이 다릅니다. 번호는 <code>%rax</code>,
+          인자는 <code>%rdi %rsi %rdx %r10 %r8 %r9</code> 순서예요.
+          네 번째가 <code>%rcx</code>가 아닌 이유는 <code>syscall</code> 명령이 <code>%rcx</code>를 리턴 주소 저장에 써 버리기 때문이고,
+          커널의 <code>syscall_handler</code>에서 인자를 꺼낼 때 이 순서를 알아야 엉뚱한 레지스터를 읽지 않아요.
+          연결 리스트 과제에서 <code>ListNode **ptrHead</code>를 넘길 때, 실제로 <code>%rdi</code>에 실려 가는 것이
+          "노드의 주소"가 아니라 "머리 포인터 변수의 주소"라는 점도 이 그림에서 또렷해집니다.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="q" data-q="11">
+      <div class="q-head">
+        <span class="q-no">11</span>
+        <span class="label q-kind">객관식 · 3.7</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem">어떤 함수가 계산 도중 <code>%rbx</code>를 임시 저장소로 쓰려고 합니다. 이때 반드시 해야 하는 일은 무엇일까요?</p>
+      <div class="choices">
+        <button type="button" class="choice" data-correct="0"><span class="key">A</span><span>아무것도 할 필요 없습니다. <code>%rbx</code>는 caller-saved라 자유롭게 덮어써도 됩니다.</span></button>
+        <button type="button" class="choice" data-correct="1"><span class="key">B</span><span>함수에 들어갈 때 <code>%rbx</code>의 기존 값을 스택에 저장하고, 리턴하기 전에 복원해야 합니다.</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">C</span><span>호출한 쪽이 대신 저장해 주므로, 이 함수는 값을 복원하지 않고 리턴하면 됩니다.</span></button>
+        <button type="button" class="choice" data-correct="0"><span class="key">D</span><span><code>%rbx</code> 대신 <code>%rsp</code>를 쓰면 저장 없이 해결됩니다.</span></button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">정답</p>
+          <p><span class="verdict">B</span> — <code>%rbx</code>는 <b>callee-saved</b>입니다. 쓰는 쪽이 책임지고 원상 복구해야 해요.</p>
+          <ul class="wrongs">
+            <li><b>A</b> caller-saved는 <code>%rax %rdi %rsi %rdx %rcx %r8~%r11</code>입니다. <code>%rbx</code>는 여기 없어요.</li>
+            <li><b>C</b> 반대입니다. callee-saved는 호출<b>받은</b> 함수의 책임입니다.</li>
+            <li><b>D</b> <code>%rsp</code>는 스택 포인터라 임시 저장소로 쓸 수 없습니다. 건드리면 리턴 자체가 깨져요.</li>
+          </ul>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p>레지스터는 16개뿐인데 함수는 서로를 마음대로 호출합니다.
+          그래서 "누가 보존할 책임을 지는가"를 미리 나눠 둔 것이 이 규약이에요.
+          호출한 쪽은 callee-saved 레지스터의 값이 호출 후에도 그대로일 거라고 믿고 쓸 수 있고,
+          caller-saved에 든 값은 호출 전에 자기가 챙겨 둬야 합니다.</p>
+          <p>덧붙여, <b>재귀 함수가 특별한 장치 없이 동작하는</b> 이유도 같은 자리에 있습니다.
+          호출마다 자기만의 스택 프레임이 새로 생기고, 각 프레임이 지역 변수와 저장된 레지스터를 따로 가지므로
+          호출끼리 서로를 덮어쓰지 않아요.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>caller saved vs callee saved registers x86-64 which is which</li>
+            <li>why recursion needs no special support stack frame per call</li>
+            <li>pintos switch_threads saved registers context switch</li>
+            <li>pintos-kaist thread_launch do_iret intr_frame</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>32비트 원본 pintos의 <code>switch_threads</code>는 정확히 callee-saved 네 개(<code>%ebx %ebp %esi %edi</code>)만
+          저장했습니다. 나머지는 caller-saved라 호출한 쪽인 <code>schedule()</code>이 이미 챙겼다고 믿을 수 있었기 때문이에요.
+          우리가 쓰는 x86-64 pintos-kaist의 <code>thread_launch</code>는 인터럽트 프레임 방식이라
+          범용 레지스터 전부를 <code>struct intr_frame</code>에 저장한 뒤 <code>do_iret</code>으로 복원합니다.
+          "왜 원본은 네 개만 저장해도 충분했는가"를 이 규약으로 설명할 수 있으면 두 구현의 차이도 같이 읽혀요.
+          그리고 이진 트리 재귀에서 "호출 스택 깊이가 O(h)"라고 말할 때의 그 스택이
+          지금 보고 있는 바로 그 스택 프레임입니다. 재귀 깊이가 깊어지면 스택 오버플로가 나는 이유도 같아요.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="q" data-q="12">
+      <div class="q-head">
+        <span class="q-no">12</span>
+        <span class="label q-kind">단답 · 3.7</span>
+        <span class="q-done mono">확인함</span>
+      </div>
+      <p class="stem">지역 변수는 원칙적으로 레지스터에 둡니다. 그런데 아래 <code>caller</code>에서
+      <code>x</code>는 레지스터가 아니라 <b>스택</b>에 놓여요. 왜 그럴까요?</p>
+      <pre class="asm">void add_to(long *p, long v);
+
+long caller(void) {
+    long x = 4;
+    add_to(&amp;x, 3);
+    return x;
+}</pre>
+      <div class="short">
+        <label class="label" for="a12" style="color:var(--ink-faint)">내 답</label>
+        <textarea id="a12" placeholder="x가 스택에 놓이는 이유를 한두 문장으로 적어 보세요."></textarea>
+        <button type="button" class="reveal">모범 답안 보기</button>
+      </div>
+      <div class="explain" hidden>
+        <div class="blk ans">
+          <p class="label">모범 답안</p>
+          <p><code>&amp;x</code>로 <b>주소를 넘기는</b> 순간 <code>x</code>는 주소를 가져야 합니다.
+          그런데 레지스터에는 주소가 없어요. 그래서 컴파일러는 <code>subq $16, %rsp</code>로 프레임을 잡아
+          <code>x</code>를 그 안에 두고, <code>leaq 8(%rsp), %rdi</code>로 그 자리의 주소를 첫 인자에 실어 보냅니다.</p>
+        </div>
+        <div class="blk why">
+          <p class="label">왜 그런가</p>
+          <p>레지스터는 메모리가 아니라서 이름은 있어도 <b>주소가 없습니다</b>.
+          C에서 <code>&amp;</code>를 붙일 수 있다는 것은 곧 "메모리 어딘가에 실체가 있다"는 뜻이고,
+          배열이나 구조체처럼 통째로 레지스터에 들어가지 않는 것도 같은 이유로 스택에 놓여요.</p>
+          <p>여기서 <code>leaq</code>가 다시 등장합니다(7번 문제). 주소를 계산하되 읽지는 않는 연산이니까요.</p>
+        </div>
+        <div class="blk find">
+          <p class="label">더 찾아볼 검색어</p>
+          <ul>
+            <li>why taking address of local variable forces it onto the stack</li>
+            <li>gdb info frame examine stack frame local variables</li>
+            <li>why returning address of local variable is undefined behavior</li>
+          </ul>
+        </div>
+        <div class="blk use">
+          <p class="label">실전에서 어디에 걸리나</p>
+          <p>연결 리스트 과제의 <code>insertNode(&amp;head, ...)</code>가 동작하는 이유가 바로 이것입니다.
+          넘어가는 값은 노드의 주소가 아니라 <b>호출자의 스택 프레임에 있는 <code>head</code> 변수의 자리</b>예요.
+          그래서 피호출 함수가 그 자리를 고치면 호출자가 보는 <code>head</code>가 실제로 바뀝니다.
+          <code>ListNode **ptrHead</code>가 필요한 이유를 이 그림으로 설명할 수 있으면 이중 포인터는 끝난 거예요.</p>
+          <p>거꾸로, 지역 변수의 주소를 <code>return</code>하면 왜 쓰레기가 되는지도 같은 그림에서 나옵니다.
+          <code>ret</code>하는 순간 그 프레임은 남의 자리가 되니까요.
+          gdb에서 <code>info frame</code>으로 그 자리를 직접 볼 수 있어요.</p>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <footer class="colophon">
+    <p>출처: Computer Systems: A Programmer's Perspective 3판, 3.1–3.7 · 조별 요약 PDF 2종</p>
+    <p>다음 범위(3.8 배열 · 3.9 구조체와 정렬 · 3.10 버퍼 오버플로우 · 3.11 부동소수점)는 아직 담지 않았습니다.</p>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var KEY = "csapp-ch3-quiz-v2";
+  var questions = Array.prototype.slice.call(document.querySelectorAll(".q"));
+  var total = questions.length;
+  var bar = document.getElementById("bar");
+  var count = document.getElementById("count");
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function save(state) {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  var state = load();
+
+  function refresh() {
+    var done = questions.filter(function (q) { return q.classList.contains("done"); }).length;
+    bar.style.width = (total ? (done / total) * 100 : 0) + "%";
+    count.textContent = done + " / " + total + " 확인";
+  }
+
+  function markDone(q, persist) {
+    q.classList.add("done");
+    var ex = q.querySelector(".explain");
+    if (ex) ex.hidden = false;
+    if (persist) {
+      state[q.dataset.q] = 1;
+      save(state);
+    }
+    refresh();
+  }
+
+  questions.forEach(function (q) {
+    var choices = Array.prototype.slice.call(q.querySelectorAll(".choice"));
+
+    function settle(picked) {
+      choices.forEach(function (c) {
+        c.disabled = true;
+        var right = c.dataset.correct === "1";
+        if (right) c.dataset.state = "right";
+        else if (c === picked) c.dataset.state = "wrong";
+        else c.dataset.state = "dim";
+      });
+    }
+
+    choices.forEach(function (c) {
+      c.addEventListener("click", function () {
+        settle(c);
+        markDone(q, true);
+      });
+    });
+
+    var reveal = q.querySelector(".reveal");
+    if (reveal) {
+      reveal.addEventListener("click", function () {
+        markDone(q, true);
+        reveal.textContent = "모범 답안 접기";
+        reveal.addEventListener("click", function toggle() {
+          var ex = q.querySelector(".explain");
+          ex.hidden = !ex.hidden;
+          reveal.textContent = ex.hidden ? "모범 답안 보기" : "모범 답안 접기";
+        });
+      }, { once: true });
+    }
+
+    if (state[q.dataset.q]) {
+      if (choices.length) {
+        choices.forEach(function (c) {
+          c.disabled = true;
+          c.dataset.state = c.dataset.correct === "1" ? "right" : "dim";
+        });
+      }
+      if (reveal) reveal.textContent = "모범 답안 접기";
+      markDone(q, false);
+    }
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    state = {};
+    save(state);
+    location.reload();
+  });
+
+  refresh();
+})();
+</script>
