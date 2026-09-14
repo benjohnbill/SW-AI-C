@@ -85,10 +85,42 @@ int main()
 
 ////////////////////////////////////////////////////////////////////////
 
-void RecursiveReverse(ListNode **ptrHead)
+// void ChildReverse(ListNode **ptrhead){
+
+//     ListNode *prev = *ptrhead;
+//     ListNode *last = *ptrhead;
+//     ListNode *head = *ptrhead;
+
+//     if (*ptrhead == NULL || last->next == NULL){
+//         return;
+//     }
+
+//     while (last != NULL && last->next != NULL){
+//         prev = last;
+//         last = last->next;
+//     }
+//     prev->next = NULL;
+//     last->next = head;
+//     *ptrhead = last;
+// }
+
+void RecursiveReverse(ListNode **ptrhead)
 {
-	/* add your code here */
+    ListNode *first;
+    ListNode *second;
+
+    if (*ptrhead == NULL || (*ptrhead)->next == NULL)
+        return;
+    first  = *ptrhead;
+    second = first->next;
+
+    RecursiveReverse(&(first->next));
+
+    *ptrhead = first->next;
+    first->next = NULL;
+    second->next = first;
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////
 

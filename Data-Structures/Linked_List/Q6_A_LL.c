@@ -88,7 +88,27 @@ int main()
 
 int moveMaxToFront(ListNode **ptrHead)
 {
-    /* add your code here */
+    if (*ptrHead == NULL){
+        return 0;
+    }
+    ListNode *max = *ptrHead;
+    ListNode *prev = *ptrHead;
+    ListNode *node = *ptrHead;
+    ListNode *late = *ptrHead;
+
+    while (node != NULL){
+        if(node->item >= max->item){
+            prev = late; // prev는 max의 이전 값
+            max = node; // max를 최댓값으로 갱신
+        }
+        late = node;
+        node = node->next;
+    }
+    prev->next = max->next;
+    if (max != *ptrHead){
+        max->next = *ptrHead;
+    }
+    *ptrHead = max;
 }
 
 //////////////////////////////////////////////////////////////////////////////////

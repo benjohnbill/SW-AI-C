@@ -86,7 +86,44 @@ int main()
 
 void moveOddItemsToBack(LinkedList *ll)
 {
-	/* add your code here */
+    if (ll == NULL || ll->head == NULL || ll->size <= 1){
+        return;
+    } // edge case
+
+    ListNode *odd = NULL;
+    ListNode *even = NULL;
+    ListNode *node = ll->head;
+    ListNode *FirstOdd = NULL;
+    ListNode *FirstEven = NULL;
+    int n = ll->size;
+    int i;
+
+    for (i = 1; i <= n; i++){
+        if (node->item % 2 != 0){
+            if (odd == NULL){
+                FirstOdd = node;
+                odd = node;
+            } // odd하고 even이 이전의 값을 가져야 한다.
+            else {
+                odd->next = node;
+                odd = node;
+            }
+        }
+        else if (node->item % 2 == 0){
+            if (even == NULL){
+                FirstEven = node;
+                even = node;
+            }
+            else {
+                even->next = node;
+                even = node;
+            }
+        }
+        node = node->next; // 한 칸 전진
+    }
+    // 홀수만 나온 상태라고 한다면, 처리를 따로 해줘야 함. even이 NULL이라;
+    even->next = FirstOdd;
+    ll->head = FirstEven;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

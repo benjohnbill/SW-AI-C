@@ -102,7 +102,34 @@ int main()
 
 void frontBackSplitLinkedList(LinkedList *ll, LinkedList *resultFrontList, LinkedList *resultBackList)
 {
-	/* add your code here */
+    if (ll == NULL || ll->head == NULL || ll->size <= 1){
+        return;
+    } // edge case
+
+    ListNode *node = ll->head;
+    ListNode *Front = NULL;
+    int n = ll->size;
+    int i;
+
+    for (i = 0; i < n; i++){ // 인덱스를 한 칸씩 전진
+        if (i == 0 || i <= (n-1) / 2){
+            if (resultFrontList->head == NULL){
+                resultFrontList->head = node;
+            } // odd하고 even이 이전의 값을 가져야 한다.
+            Front = node;
+            resultFrontList->size++; // Front칸 전진
+        }
+        else if (i > (n-1) / 2){
+            if (resultBackList->head == NULL){
+                resultBackList->head = node;
+                Front->next = NULL;
+            }
+            resultBackList->size++; // Back칸 전진
+        }
+        node = node->next; // node가 한 칸 전진
+    }
+    ll->head = NULL; // 이중 free()방지를 위한 ll->head 초기화
+    ll->size = 0; // 이중 free()방지를 위한 ll->size 초기화
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

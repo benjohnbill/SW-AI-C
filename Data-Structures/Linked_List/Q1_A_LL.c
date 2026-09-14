@@ -22,6 +22,7 @@ typedef struct _linkedlist{
 } LinkedList;			// You should not change the definition of LinkedList
 
 
+
 ///////////////////////// function prototypes ////////////////////////////////////
 
 //You should not change the prototype of this function
@@ -90,7 +91,29 @@ int main()
 
 int insertSortedLL(LinkedList *ll, int item)
 {
-	/* add your code here */
+    ListNode *cur = ll->head;
+    ListNode *prev = NULL;
+    int index = 0;
+
+    while (1) {
+        if (cur == NULL || item < cur->item){
+            ListNode *result = malloc(sizeof(ListNode));
+            result -> item = item;
+            result -> next = cur;
+            ll->size++;
+            if (prev == NULL){
+            ll -> head = result;
+            }
+            else {prev -> next = result;}
+            return index;
+        } if (item > cur->item){
+            index++;
+            prev = cur;
+            cur = cur->next;
+        } else {
+            return -1;
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -126,6 +149,7 @@ void removeAllItems(LinkedList *ll)
 	ll->head = NULL;
 	ll->size = 0;
 }
+
 
 
 ListNode *findNode(LinkedList *ll, int index){

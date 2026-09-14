@@ -103,7 +103,64 @@ int main()
 
 void alternateMergeLinkedList(LinkedList *ll1, LinkedList *ll2)
 {
-    /* add your code here */
+	ListNode *cur1 = ll1->head;
+	ListNode *cur2 = ll2->head;
+	ListNode *node;
+	ListNode *tmp = NULL;
+	ListNode *FirstNode = NULL;
+	ListNode *prev1 = ll1->head;
+
+	int i, n;
+	n = ll1->size + ll2->size;
+
+	for (i = 1; i <= n; i++){
+		node = malloc(sizeof(ListNode));
+		node->item = 0;
+		node->next = NULL;
+
+		if (i%2 != 0 || cur2 == NULL){
+			if (cur1 == NULL){
+			    free(node);
+			    break;
+			}
+			else if (tmp == NULL){
+			    FirstNode = node;
+			}
+			else
+			    tmp->next = node;
+			node->item = cur1->item;
+			cur1 = cur1->next;
+			tmp = node;
+		}
+		else {
+			tmp->next = node;
+			node->item = cur2->item;
+			cur2 = cur2->next;
+			ll1->size++;
+			ll2->size--;
+			tmp = node;
+		}
+	}
+	// ll2에 남아있는 원본 원소들 free() 해주기(다른 함수에서 malloc() 함)
+	ListNode *org2 = ll2->head;
+	ListNode *temp2;
+
+	while (org2 != cur2) {
+	    temp2 = org2->next;
+		free(org2);
+		org2 = temp2;
+	}
+
+	ll2->head = cur2;
+
+	ListNode *OrgFirst = prev1;
+	ListNode *temp1;
+	while (OrgFirst != NULL) {
+	    temp1 = OrgFirst->next;
+		free(OrgFirst);
+		OrgFirst = temp1;
+	}
+	ll1->head = FirstNode;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
