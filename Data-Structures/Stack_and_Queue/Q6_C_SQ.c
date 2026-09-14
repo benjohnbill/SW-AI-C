@@ -111,7 +111,18 @@ int main()
 
 void removeUntil(Stack *s, int value)
 {
-/* add your code here */
+    if (s == NULL || s->ll.size == 0)
+        return; // stack이 비어있는 경우
+
+    int i, initialSize;
+    initialSize = s->ll.size;
+
+    for (i = initialSize; i > 1; i--) //
+    {
+        if (peek(s) == value)
+            break;
+        pop(s); // value가 나올 때까지 계속 pop()
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////
