@@ -9,6 +9,7 @@ typedef struct _listnode {
 	struct _listnode *next;
 } ListNode;
 
+
 int main(void)
 {
 	ListNode *a = malloc(sizeof(ListNode));
@@ -20,7 +21,6 @@ int main(void)
 
 	printf("before: cur=%p  cur->item=%d  cur->next=%p\n",
 	       (void *)cur, cur->item, (void *)cur->next);
-
 	cur = cur->next;
 
 	printf("after : cur=%p  cur->item=%d  cur->next=%p\n",

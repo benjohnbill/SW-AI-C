@@ -15,19 +15,19 @@ SANFLAGS := -fsanitize=address,undefined -fno-omit-frame-pointer
 BIN   := build
 VPATH := Data-Structures/Linked_List Data-Structures/Stack_and_Queue Data-Structures/Binary_Tree Data-Structures/Binary_Search_Tree scratch
 
-NAMES  := Q1_A_LL Q2_A_LL Q3_A_LL Q4_A_LL Q5_A_LL Q6_A_LL Q7_A_LL Q1_C_SQ Q2_C_SQ Q3_C_SQ Q4_C_SQ Q5_C_SQ Q6_C_SQ Q7_C_SQ Q1_E_BT Q2_E_BT Q3_E_BT Q4_E_BT Q5_E_BT Q6_E_BT Q7_E_BT Q8_E_BT Q1_F_BST Q2_F_BST Q3_F_BST Q4_F_BST Q5_F_BST play1 play2
+NAMES  := Q1_A_LL Q2_A_LL Q3_A_LL Q4_A_LL Q5_A_LL Q6_A_LL Q7_A_LL Q1_C_SQ Q2_C_SQ Q3_C_SQ Q4_C_SQ Q5_C_SQ Q6_C_SQ Q7_C_SQ Q1_E_BT Q2_E_BT Q3_E_BT Q4_E_BT Q5_E_BT Q6_E_BT Q7_E_BT Q8_E_BT Q1_F_BST Q2_F_BST Q3_F_BST Q4_F_BST Q5_F_BST play1 play2 play3 play4 play5
 
-RNAMES := r_Q1_A_LL r_Q2_A_LL r_Q3_A_LL r_Q4_A_LL r_Q5_A_LL r_Q6_A_LL r_Q7_A_LL r_Q1_C_SQ r_Q2_C_SQ r_Q3_C_SQ r_Q4_C_SQ r_Q5_C_SQ r_Q6_C_SQ r_Q7_C_SQ r_Q1_E_BT r_Q2_E_BT r_Q3_E_BT r_Q4_E_BT r_Q5_E_BT r_Q6_E_BT r_Q7_E_BT r_Q8_E_BT r_Q1_F_BST r_Q2_F_BST r_Q3_F_BST r_Q4_F_BST r_Q5_F_BST r_play1 r_play2
+RNAMES := r_Q1_A_LL r_Q2_A_LL r_Q3_A_LL r_Q4_A_LL r_Q5_A_LL r_Q6_A_LL r_Q7_A_LL r_Q1_C_SQ r_Q2_C_SQ r_Q3_C_SQ r_Q4_C_SQ r_Q5_C_SQ r_Q6_C_SQ r_Q7_C_SQ r_Q1_E_BT r_Q2_E_BT r_Q3_E_BT r_Q4_E_BT r_Q5_E_BT r_Q6_E_BT r_Q7_E_BT r_Q8_E_BT r_Q1_F_BST r_Q2_F_BST r_Q3_F_BST r_Q4_F_BST r_Q5_F_BST r_play1 r_play2 r_play3 r_play4 r_play5
 
-GNAMES := g_Q1_A_LL g_Q2_A_LL g_Q3_A_LL g_Q4_A_LL g_Q5_A_LL g_Q6_A_LL g_Q7_A_LL g_Q1_C_SQ g_Q2_C_SQ g_Q3_C_SQ g_Q4_C_SQ g_Q5_C_SQ g_Q6_C_SQ g_Q7_C_SQ g_Q1_E_BT g_Q2_E_BT g_Q3_E_BT g_Q4_E_BT g_Q5_E_BT g_Q6_E_BT g_Q7_E_BT g_Q8_E_BT g_Q1_F_BST g_Q2_F_BST g_Q3_F_BST g_Q4_F_BST g_Q5_F_BST g_play1 g_play2
+GNAMES := g_Q1_A_LL g_Q2_A_LL g_Q3_A_LL g_Q4_A_LL g_Q5_A_LL g_Q6_A_LL g_Q7_A_LL g_Q1_C_SQ g_Q2_C_SQ g_Q3_C_SQ g_Q4_C_SQ g_Q5_C_SQ g_Q6_C_SQ g_Q7_C_SQ g_Q1_E_BT g_Q2_E_BT g_Q3_E_BT g_Q4_E_BT g_Q5_E_BT g_Q6_E_BT g_Q7_E_BT g_Q8_E_BT g_Q1_F_BST g_Q2_F_BST g_Q3_F_BST g_Q4_F_BST g_Q5_F_BST g_play1 g_play2 g_play3 g_play4 g_play5
 
-SNAMES := s_Q1_A_LL s_Q2_A_LL s_Q3_A_LL s_Q4_A_LL s_Q5_A_LL s_Q6_A_LL s_Q7_A_LL s_Q1_C_SQ s_Q2_C_SQ s_Q3_C_SQ s_Q4_C_SQ s_Q5_C_SQ s_Q6_C_SQ s_Q7_C_SQ s_Q1_E_BT s_Q2_E_BT s_Q3_E_BT s_Q4_E_BT s_Q5_E_BT s_Q6_E_BT s_Q7_E_BT s_Q8_E_BT s_Q1_F_BST s_Q2_F_BST s_Q3_F_BST s_Q4_F_BST s_Q5_F_BST s_play1 s_play2
+SNAMES := s_Q1_A_LL s_Q2_A_LL s_Q3_A_LL s_Q4_A_LL s_Q5_A_LL s_Q6_A_LL s_Q7_A_LL s_Q1_C_SQ s_Q2_C_SQ s_Q3_C_SQ s_Q4_C_SQ s_Q5_C_SQ s_Q6_C_SQ s_Q7_C_SQ s_Q1_E_BT s_Q2_E_BT s_Q3_E_BT s_Q4_E_BT s_Q5_E_BT s_Q6_E_BT s_Q7_E_BT s_Q8_E_BT s_Q1_F_BST s_Q2_F_BST s_Q3_F_BST s_Q4_F_BST s_Q5_F_BST s_play1 s_play2 s_play3 s_play4 s_play5
 
 LL_LIST  := Q1_A_LL Q2_A_LL Q3_A_LL Q4_A_LL Q5_A_LL Q6_A_LL Q7_A_LL 
 SQ_LIST  := Q1_C_SQ Q2_C_SQ Q3_C_SQ Q4_C_SQ Q5_C_SQ Q6_C_SQ Q7_C_SQ 
 BT_LIST  := Q1_E_BT Q2_E_BT Q3_E_BT Q4_E_BT Q5_E_BT Q6_E_BT Q7_E_BT Q8_E_BT 
 BST_LIST := Q1_F_BST Q2_F_BST Q3_F_BST Q4_F_BST Q5_F_BST 
-PLAY_LIST := play1 play2
+PLAY_LIST := play1 play2 play3 play4 play5
 
 .DEFAULT_GOAL := help
 
@@ -46,7 +46,7 @@ $(RNAMES): r_%: $(BIN)/%
 	@./$<
 
 $(GNAMES): g_%: $(BIN)/%
-	@gdb ./$<
+	@gdb -q -x scratch/walk.gdb ./$<
 
 $(SNAMES): s_%: %.c | $(BIN)
 	$(CC) $(CFLAGS) $(SANFLAGS) $< -o $(BIN)/$*_san
