@@ -16,3 +16,9 @@ core.*
 
 # make 로 만든 실행 파일
 build/
+
+# gdb 로컬 히스토리
+.gdb_history
+
+# Zed 디버그 설정 자동 백업본
+.zed/debug.json.bak-*
