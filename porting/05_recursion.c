@@ -22,15 +22,14 @@ int fibonacci(int n){
 int main(void)
 {
     printf("\n=== 팩토리얼 계산 ===\n");
-    for (int i = 0; i < fact_upto; i++){
+    for (int i = 0; i < fc1; i++){
         printf("%d! = %d\n", i, factorial(i));
     }
-
     printf("\n=== 피보나치 수열 ===\n");
-    for (int i = 0; i < fib_upto; i++){
+    for (int i = 0; i < fb1; i++){
         printf("fib(%d) = %d\n", i, fibonacci(i));
     }
     printf("\n=== 추가 테스트 ===\n");
-    printf("%d! = %d\n", fact_extra, factorial(fact_extra));
-    printf("fib(%d) = %d\n", fib_extra, fibonacci(fib_extra));
+    printf("%d! = %d\n", fc2, factorial(fc2));
+    printf("fib(%d) = %d\n", fb2, fibonacci(fb2));
 }
