@@ -6,13 +6,15 @@
 #ifndef CASES_04_BRUTE_FORCE_H
 #define CASES_04_BRUTE_FORCE_H
 
-const int case1[] = {2, 7, 11, 15};
-const int case1_target = 9;
+/* 이름표: bf1~bf3 = 배열(brute force), sm1~sm3 = 목표 합(sum) */
 
-const int case2[] = {1, 3, 4, 2, 5, 6};
-const int case2_target = 7;
+const int bf1[] = {2, 7, 11, 15};
+const int sm1 = 9;
 
-const int case3[] = {1, 1, 1, 1};
-const int case3_target = 2;
+const int bf2[] = {1, 3, 4, 2, 5, 6};
+const int sm2 = 7;
+
+const int bf3[] = {1, 1, 1, 1};
+const int sm3 = 2;
 
 #endif

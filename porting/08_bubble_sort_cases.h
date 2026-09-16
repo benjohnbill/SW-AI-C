@@ -7,8 +7,10 @@
 #ifndef CASES_08_BUBBLE_SORT_H
 #define CASES_08_BUBBLE_SORT_H
 
-const int case1[] = {64, 34, 25, 12, 22, 11, 90};
-const int case2[] = {1, 2, 3, 4, 5};   /* 이미 정렬됨 — 최적화 버전으로 */
-const int case3[] = {5, 4, 3, 2, 1};   /* 역순 */
+/* 이름표: bb1~bb3 = 정렬할 배열(bubble) */
+
+const int bb1[] = {64, 34, 25, 12, 22, 11, 90};
+const int bb2[] = {1, 2, 3, 4, 5};   /* 이미 정렬됨 — 최적화 버전으로 */
+const int bb3[] = {5, 4, 3, 2, 1};   /* 역순 */
 
 #endif

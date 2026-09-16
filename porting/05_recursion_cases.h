@@ -6,9 +6,11 @@
 #ifndef CASES_05_RECURSION_H
 #define CASES_05_RECURSION_H
 
-const int fact_upto  = 6;   /* 0! 부터 5! 까지 */
-const int fib_upto   = 10;  /* fib(0) 부터 fib(9) 까지 */
-const int fact_extra = 10;  /* 추가 테스트: 10! */
-const int fib_extra  = 15;  /* 추가 테스트: fib(15) */
+/* 이름표: fc = factorial, fb = fibonacci / 1 = 반복 상한, 2 = 추가 테스트 */
+
+const int fc1 = 6;   /* 0! 부터 5! 까지 */
+const int fb1 = 10;  /* fib(0) 부터 fib(9) 까지 */
+const int fc2 = 10;  /* 추가 테스트: 10! */
+const int fb2 = 15;  /* 추가 테스트: fib(15) */
 
 #endif

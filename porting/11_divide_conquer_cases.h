@@ -6,8 +6,10 @@
 #ifndef CASES_11_DIVIDE_CONQUER_H
 #define CASES_11_DIVIDE_CONQUER_H
 
-const int case1[] = {3, 5, 1, 8, 2, 9, 4};
-const int case2[] = {10, 20, 30, 40, 50};
-const int case3[] = {100};
+/* 이름표: dc1~dc3 = 배열(divide and conquer) */
+
+const int dc1[] = {3, 5, 1, 8, 2, 9, 4};
+const int dc2[] = {10, 20, 30, 40, 50};
+const int dc3[] = {100};
 
 #endif

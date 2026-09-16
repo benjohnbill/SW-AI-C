@@ -7,11 +7,13 @@
 #ifndef CASES_09_NUMBER_THEORY_H
 #define CASES_09_NUMBER_THEORY_H
 
-const int case1_a = 48,  case1_b = 18;
-const int case2_a = 100, case2_b = 75;
-const int case3_a = 17,  case3_b = 19;   /* 서로소 */
-const int case4_a = 35,  case4_b = 15;   /* 확장 유클리드 */
+/* 이름표: na1~na4 = a, nb1~nb4 = b, np1 = 소수 배열 — number theory */
 
-const int case5_primes[] = {2, 3, 4, 17, 20, 29, 100};
+const int na1 = 48,  nb1 = 18;
+const int na2 = 100, nb2 = 75;
+const int na3 = 17,  nb3 = 19;   /* 서로소 */
+const int na4 = 35,  nb4 = 15;   /* 확장 유클리드 */
+
+const int np1[] = {2, 3, 4, 17, 20, 29, 100};
 
 #endif

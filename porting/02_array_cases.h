@@ -6,13 +6,15 @@
 #ifndef CASES_02_ARRAY_H
 #define CASES_02_ARRAY_H
 
-const int case1[3][3] = {
+/* 이름표: mx1 = 3x3, mx2 = 4x4 행렬(matrix) */
+
+const int mx1[3][3] = {
     {1, 2, 3},
     {4, 5, 6},
     {7, 8, 9}
 };
 
-const int case2[4][4] = {
+const int mx2[4][4] = {
     {1,  2,  3,  4},
     {5,  6,  7,  8},
     {9,  10, 11, 12},

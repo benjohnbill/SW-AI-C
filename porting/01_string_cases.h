@@ -6,9 +6,11 @@
 #ifndef CASES_01_STRING_H
 #define CASES_01_STRING_H
 
-const char *const case1 = "A man, a plan, a canal: Panama";
-const char *const case2 = "race a car";
-const char *const case3 = "Was it a car or a cat I saw?";
-const char *const case4 = "Madam";
+/* 이름표: st1~st4 = 검사할 문자열(string) */
+
+const char *const st1 = "A man, a plan, a canal: Panama";
+const char *const st2 = "race a car";
+const char *const st3 = "Was it a car or a cat I saw?";
+const char *const st4 = "Madam";
 
 #endif

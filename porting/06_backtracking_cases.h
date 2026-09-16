@@ -6,9 +6,11 @@
 #ifndef CASES_06_BACKTRACKING_H
 #define CASES_06_BACKTRACKING_H
 
-const int case1_n = 4, case1_k = 2;
-const int case2_n = 5, case2_k = 3;
-const int case3_n = 3, case3_k = 1;
-const int case4_n = 4, case4_k = 4;
+/* 이름표: cn1~cn4 = n(범위), ck1~ck4 = k(뽑을 개수) — combination */
+
+const int cn1 = 4, ck1 = 2;
+const int cn2 = 5, ck2 = 3;
+const int cn3 = 3, ck3 = 1;
+const int cn4 = 4, ck4 = 4;
 
 #endif
