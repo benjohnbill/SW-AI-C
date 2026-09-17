@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C의 배열은 함수에 들어가는 순간 배열이 아니다</title>
+
+<!-- 폰트: IBM Plex Sans KR(본문·제목) · IBM Plex Mono(코드) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ===========================================
+   1. 테마 변수 — 색과 크기는 전부 여기서 바꾼다
+   스타일: Swiss Modern (흰 바탕 · 격자 · 단일 빨강 악센트)
+   =========================================== */
+:root {
+    --paper:  #ffffff;   /* 바탕 */
+    --ink:    #0a0a0a;   /* 본문 글자 */
+    --red:    #ff3300;   /* 유일한 악센트. 한 화면에 한두 군데만 */
+    --grid:   #ebebeb;   /* 배경 격자선 */
+    --mut:    #6b6b6b;   /* 보조 글자 */
+    --panel:  #f7f7f5;   /* 코드 패널 바탕 */
+    --panel-b:#0a0a0a;   /* 코드 패널 테두리 */
+
+    --font-body:    'IBM Plex Sans KR', sans-serif;
+    --font-mono:    'IBM Plex Mono', monospace;
+
+    /* 타이포 — 전부 clamp. 대형 모니터와 노트북 모두에서 깨지지 않는다 */
+    --title-size:    clamp(2.4rem, 4.8vw, 7.5rem);
+    --h2-size:       clamp(1.4rem, 2.3vw, 3.2rem);
+    --h3-size:       clamp(1.1rem, 1.6vw, 2.2rem);
+    --body-size:     clamp(0.95rem, 1.15vw, 1.65rem);
+    --small-size:    clamp(0.72rem, 0.78vw, 1.15rem);
+    --code-size:     clamp(0.85rem, 1.12vw, 1.7rem);
+
+    --slide-padding: clamp(1rem, 4vw, 4rem);
+    --content-gap:   clamp(0.5rem, 2vw, 2rem);
+    --element-gap:   clamp(0.25rem, 1vw, 1rem);
+
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur:  0.65s;
+}
+
+/* ===========================================
+   2. 기본 초기화
+   =========================================== */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+/* ===========================================
+   3. VIEWPORT FITTING — 필수 기본 스타일
+   (viewport-base.css 전문. 슬라이드가 화면을 넘지 않게 하는 계약)
+   =========================================== */
+html, body {
+    height: 100%;
+    overflow-x: hidden;
+}
+html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+.slide {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;            /* 중요: 어떤 경우에도 넘치지 않는다 */
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.slide-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-height: 100%;
+    overflow: hidden;
+    /* 세로 여백을 줄여서 그만큼을 코드 크기로 돌린다 */
+    padding: clamp(.5rem, 1.4vh, 1.1rem) var(--slide-padding);
+}
+.card, .container, .content-box {
+    max-width: min(90vw, 1000px);
+    max-height: min(80vh, 700px);
+}
+.feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+.feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+}
+img, .image-container {
+    max-width: 100%;
+    max-height: min(50vh, 400px);
+    object-fit: contain;
+}
+
+/* 낮은 화면 (700px 미만) */
+@media (max-height: 700px) {
+    :root {
+        --slide-padding: clamp(0.75rem, 3vw, 2rem);
+        --content-gap:   clamp(0.4rem, 1.5vw, 1rem);
+        --title-size:    clamp(1.25rem, 4.5vw, 2.5rem);
+        --h2-size:       clamp(1rem, 3vw, 1.75rem);
+    }
+}
+/* 아주 낮은 화면 (600px 미만) */
+@media (max-height: 600px) {
+    :root {
+        --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+        --content-gap:   clamp(0.3rem, 1vw, 0.75rem);
+        --title-size:    clamp(1.1rem, 4vw, 2rem);
+        --body-size:     clamp(0.7rem, 1.2vw, 0.95rem);
+    }
+    .nav-dots, .keyboard-hint, .decorative { display: none; }
+}
+/* 극단적으로 낮은 화면 (500px 미만) */
+@media (max-height: 500px) {
+    :root {
+        --slide-padding: clamp(0.4rem, 2vw, 1rem);
+        --title-size:    clamp(1rem, 3.5vw, 1.5rem);
+        --h2-size:       clamp(0.9rem, 2.5vw, 1.25rem);
+        --body-size:     clamp(0.65rem, 1vw, 0.85rem);
+    }
+}
+/* 좁은 화면 (600px 미만) */
+@media (max-width: 600px) {
+    :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+    .grid { grid-template-columns: 1fr; }
+}
+/* 모션 축소 선호 존중 */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.2s !important;
+    }
+    html { scroll-behavior: auto; }
+}
+
+/* ===========================================
+   4. 슬라이드 뼈대 — 스위스 격자
+   위 머리띠 / 가운데 본문 / 아래 발띠 의 3단 구조
+   =========================================== */
+body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 400;
+}
+
+/* 배경 12열 격자 — 스위스 스타일의 서명 요소 */
+.slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 8.3333%);
+    opacity: .6;
+    z-index: 0;
+}
+
+.slide-content { gap: var(--content-gap); }
+
+/* 각 장의 핵심 문장. 발띠에 두면 가장 작고 옅은 자리라 위계가 뒤집힌다 */
+h2.thesis {
+    font-size: var(--h3-size);
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin-bottom: clamp(.1rem, .4vh, .4rem);
+}
+h2.thesis b { color: var(--red); font-weight: 700; }
+
+/* 머리띠: 왼쪽 구역 이름, 오른쪽 번호 */
+.head {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 2px solid var(--ink);
+    padding: 0 var(--slide-padding) clamp(.4rem, 1vh, .7rem);
+    margin: 0 0 0;
+}
+/* 머리띠에 len() · copy1 같은 식별자가 들어간다. 대문자로 바꾸면 다른 이름이 된다 */
+.head .label {
+    font-family: var(--font-mono);
+    font-size: var(--small-size);
+    letter-spacing: .02em;
+    color: var(--mut);
+}
+/* 슬라이드 번호는 장식이 아니라 셈이다. 머리띠 오른쪽에 작게 한 번만 둔다 */
+.head .num {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: var(--small-size);
+    letter-spacing: .1em;
+    color: var(--mut);
+    line-height: 1;
+}
+.head-space { padding-top: clamp(1.1rem, 3.5vh, 2.6rem); }
+
+/* 발띠 */
+.foot {
+    position: relative; z-index: 2;
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid var(--ink);
+    margin: 0 var(--slide-padding) clamp(1rem, 3vh, 2.2rem);
+    padding-top: clamp(.35rem, 1vh, .6rem);
+    font-family: var(--font-mono);
+    font-size: var(--small-size);
+    color: var(--mut);
+}
+
+/* 한국어는 어절 단위로 끊어야 읽힌다. 이 규칙이 없으면 아무 데서나 잘린다 */
+h1, h2, .sub, .punch, .takeaway, .msgs li, .foot span, .head .label {
+    word-break: keep-all;
+    text-wrap: pretty;
+}
+h1, h2 { text-wrap: balance; }
+
+/* ===========================================
+   5. 본문 요소
+   =========================================== */
+h1 {
+    font-family: var(--font-body);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    font-size: var(--title-size);
+    max-width: 19ch;
+    position: relative; z-index: 2;
+}
+h1 em { font-style: normal; color: var(--red); }
+
+h2 {
+    font-family: var(--font-body);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -.015em;
+    font-size: var(--h2-size);
+    position: relative; z-index: 2;
+}
+h2 em { font-style: normal; color: var(--red); }
+
+.eyebrow {
+    display: inline-block; align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: var(--small-size);
+    letter-spacing: .2em; text-transform: uppercase;
+    color: var(--paper); background: var(--red);
+    padding: .35em .75em;
+    position: relative; z-index: 2;
+}
+.rule {
+    width: clamp(70px, 9vw, 180px);
+    height: clamp(6px, .55vw, 12px); background: var(--ink);
+    margin-top: clamp(.3rem, 1vh, .9rem);   /* 큰 글자의 아래 삐침과 겹치지 않게 */
+    position: relative; z-index: 2;
+}
+.sub {
+    font-weight: 400; color: #444;
+    font-size: clamp(1.1rem, 1.5vw, 2.1rem);
+    line-height: 1.6; max-width: 38ch;
+    position: relative; z-index: 2;
+}
+/* 제목 슬라이드 오른쪽의 원 — 유일한 장식 */
+.dot {
+    position: absolute; z-index: 1;
+    right: var(--slide-padding); top: 50%;
+    transform: translateY(-50%);
+    width: clamp(36px, 5.5vw, 68px); aspect-ratio: 1;
+    background: var(--red); border-radius: 50%;
+}
+
+/* ===========================================
+   6. 코드 패널 — 이 발표의 주인공
+   머리 띠(검정)에 파일명, 아래에 코드
+   =========================================== */
+.panels {
+    display: grid; gap: clamp(.6rem, 1.6vw, 1.4rem);
+    grid-template-columns: 1fr 1fr;
+    position: relative; z-index: 2;
+    align-items: stretch;
+}
+.panels.one { grid-template-columns: 1fr; }
+
+.panel {
+    border: 2px solid var(--panel-b);
+    background: var(--panel);
+    display: flex; flex-direction: column;
+    min-width: 0;                       /* 긴 코드 줄이 격자를 밀지 않게 */
+    overflow: hidden;
+}
+.panel > .cap {
+    background: var(--panel-b); color: var(--paper);
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: var(--small-size);
+    letter-spacing: .08em;
+    padding: .38em .7em;
+    display: flex; justify-content: space-between; gap: .6em;
+}
+.panel > .cap .side { color: var(--red); }
+.panel.accent { border-color: var(--red); }
+.panel.accent > .cap { background: var(--red); }
+.panel.accent > .cap .side { color: var(--paper); }
+
+pre {
+    font-family: var(--font-mono);
+    font-size: var(--code-size);
+    line-height: 1.62;
+    padding: clamp(.6rem, 1.6vh, 1.1rem) clamp(.7rem, 1.4vw, 1.2rem);
+    overflow: hidden;
+    white-space: pre;
+    tab-size: 4;
+    flex: 1;
+}
+/* 코드 안의 색 — 빨강은 "여기를 보라"는 표시로만 쓴다 */
+.c-key { color: var(--mut); }
+.c-hit { color: var(--red); font-weight: 600; }
+.c-com { color: #9a9a9a; }
+.c-dim { color: #b4b4b4; }
+
+/* ch 는 바깥 상자의 폰트 기준이라 코드 폭과 맞지 않는다.
+   내용 폭에 맞춰 늘리되 화면을 넘지 않게 한다 */
+.panels.one.gdb { grid-template-columns: minmax(0, max-content); justify-content: start; }
+.panels.gdb pre { font-size: clamp(1.05rem, 1.5vw, 2.3rem); }
+
+/* 결론 한 줄 — 코드 아래에 붙는 굵은 문장 */
+.punch {
+    position: relative; z-index: 2;
+    padding: clamp(.4rem,1vh,.7rem) 0;
+    font-size: clamp(1.05rem, 1.32vw, 1.95rem);
+    font-weight: 500; line-height: 1.5;
+    max-width: 62ch;
+}
+/* 문장 앞의 빨간 정사각형 — 세로 막대 대신 쓰는 표식 */
+.punch::before {
+    content: "";
+    display: inline-block;
+    width: .6em; height: .6em;
+    background: var(--red);
+    margin-right: .55em;
+    vertical-align: .02em;
+}
+.punch b { color: var(--red); font-weight: 700; }
+
+/* 마지막 장의 체크 항목 상자 */
+.takeaway {
+    position: relative; z-index: 2;
+    border: 2px solid var(--ink);
+    padding: clamp(.8rem,2vh,1.4rem) clamp(.9rem,1.8vw,1.6rem);
+    max-width: 58ch;
+    font-size: clamp(1rem, 1.28vw, 1.85rem);
+    line-height: 1.6;
+}
+.takeaway .k {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--small-size);
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: .5em;
+}
+
+/* ===========================================
+   6-A. 좌우 대칭 두 칸 — 퀴즈
+   왼쪽: 식에 놓인 배열  오른쪽: 인자로 들어간 배열
+   답(20 / 8)과 컴파일러가 읽는 모양은 한 번 눌러야 나온다
+   =========================================== */
+.mirror {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: clamp(.8rem, 2vw, 1.8rem);
+    position: relative; z-index: 2;
+    align-items: start;
+}
+.mirror > * { min-width: 0; }
+.mirror pre { font-size: clamp(1rem, min(1.55vw, 2.6vh), 2.3rem); line-height: 1.6; }
+.mirror .c-com { color: var(--mut); }
+.mirror .c-ans { color: var(--red); font-weight: 700; }
+.mirror + .msgs { max-width: none; }
+.mirror + .msgs li { font-size: clamp(1.05rem, 1.34vw, 1.92rem); }
+.mirror + .msgs code { font-family: var(--font-mono); font-weight: 600; }
+
+
+/* ===========================================
+   7-B. 두 단계 전환 (轉) · 인자 상자 · 잠깐 보이는 패널
+   =========================================== */
+/* 2단계 슬라이드의 코드 전환은 두 번째 누름에서 일어난다 */
+.slide[data-step="1"] .swap.s2 > .st-b { opacity: 1; transform: none; }
+.slide[data-step="1"] .swap.s2 > .st-a { opacity: 0; transform: translateY(.35em); }
+.slide[data-step="2"] .swap > .st-b { opacity: 0; transform: translateY(-.35em); }
+.slide[data-step="2"] .swap > .st-a { opacity: 1; transform: none; }
+/* 누른 뒤에야 나오는 한 줄 */
+.slide[data-step="0"] .punch.late { opacity: 0; transform: translateY(.3em); }
+.punch.late { transition: opacity .3s ease, transform .3s ease; }
+.slide[data-step="1"] .punch.late, .slide[data-step="2"] .punch.late { opacity: 1; transform: none; }
+/* 아직 누를 단계가 남았을 때만 점이 보인다 */
+.slide[data-max-step="2"][data-step="1"] .step-dot { display: block; }
+.slide[data-step="2"] .step-dot { display: none; }
+/* 참고 칸의 아래 패널: ed 는 두 화면 동안 서 있다가, 마지막 화면에서 main 호출부로 바뀐다 */
+.slide[data-step="2"] .peek-ed { display: none; }
+.slide:not([data-step="2"]) .peek-main { display: none; }
+.col.ref .peek .c-hit { color: var(--red); font-weight: 700; }
+/* 한 번 누르면: 비교하는 세 줄에 밑줄, 거짓 분기 0 에 상자 */
+.ul { text-decoration: none; }
+.slide[data-step="1"] .ul { text-decoration: underline; text-decoration-color: var(--red); text-decoration-thickness: .12em; text-underline-offset: .18em; }
+.zero { padding: 0 .25em; border: 2px solid transparent; }
+.slide[data-step="1"] .zero { border-color: var(--red); color: var(--red); font-weight: 700; }
+/* 인자 표시: 함수 머리 위 한 줄. 코드 패널과 같은 선 굵기, 채움 없음.
+   첫 누름에 arr 쪽, 두 번째 누름에 n 쪽이 나타난다. 자리는 처음부터 잡아 둔다 */
+.args {
+    display: flex; flex-wrap: wrap; gap: clamp(.5rem, 1.2vw, 1.2rem);
+    padding: clamp(.5rem, 1.3vh, .9rem) clamp(.7rem, 1.4vw, 1.2rem) 0;
+    font-family: var(--font-mono);
+    font-size: clamp(.8rem, min(1.05vw, 1.8vh), 1.5rem);
+    min-height: 2.4em;
+}
+.args .arg {
+    display: inline-flex; align-items: baseline; gap: .6em;
+    border: 2px solid var(--ink); padding: .22em .7em;
+    opacity: 0; transform: translateY(-.3em);
+    transition: opacity .3s ease .12s, transform .3s ease .12s;
+}
+.args .arg .to { color: var(--mut); }
+.args .arg code { color: var(--red); font-weight: 700; }
+.args .arg small { color: var(--mut); font-size: .85em; }
+.slide[data-step="1"] .arg.a1, .slide[data-step="2"] .arg.a1, .slide[data-step="2"] .arg.a2 { opacity: 1; transform: none; }
+
+/* 結: 왼쪽 gdb 한 칸이 두 줄을 차지하고, 오른쪽에 ed 와 for 문이 쌓인다 */
+.panels.trio {
+    grid-template-columns: 1fr 1fr; grid-template-rows: auto auto;
+    align-items: stretch;
+}
+.panels.trio .tall { grid-row: 1 / 3; }
+.panels.trio pre { font-size: clamp(.9rem, min(1.2vw, 2.1vh), 1.9rem); line-height: 1.55; }
+
+/* ===========================================
+   6-B. 두 칸 작업 화면
+   왼쪽: 지금 이야기하는 소스 덩어리
+   오른쪽: 헤더와 기대 출력 — 발표 내내 자리를 지킨다
+   =========================================== */
+.work {
+    flex: 0 1 auto; min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.72fr) minmax(0, 1fr);
+    gap: clamp(.6rem, 1.4vw, 1.3rem);
+    position: relative; z-index: 2;
+}
+.work > * { min-height: 0; min-width: 0; }
+.col {
+    display: flex; flex-direction: column;
+    gap: clamp(.45rem, 1.2vh, .9rem);
+    min-height: 0;
+}
+/* 본 소스는 크게, 참고 자료는 작게.
+   src 패널은 남는 높이를 채워서 화면 아래가 비지 않게 한다 */
+.col.src { justify-content: flex-start; }  /* 두 칸의 윗선을 맞춘다 — 스위스 격자의 규율 */
+.col.src pre { line-height: 1.6; }
+
+/* 덩어리 길이에 따라 글자 크기를 달리 잡는다.
+   짧은 덩어리는 크게 띄워서 화면이 비지 않게 한다 */
+/* 폭과 높이 중 더 모자란 쪽을 따라간다. 화면이 낮으면 글자도 같이 줄어서 잘리지 않는다 */
+.col.src.zoom-b pre { font-size: clamp(.95rem, min(1.36vw, 2.3vh), 2.05rem); } /* 起 — 짧은 덩어리 둘 */
+.col.src.zoom-c pre { font-size: clamp(.95rem, min(1.3vw, 2.12vh), 2.05rem); } /* 承·轉 — 10~11줄 */
+
+.col.ref { justify-content: flex-start; }
+.col.ref pre { font-size: clamp(.85rem, 1vw, 1.45rem); line-height: 1.58; }
+.col.ref .cap { font-size: clamp(.75rem, .8vw, 1.15rem); }
+.col.ref .panel { border-width: 2px; }
+/* 참고 칸은 조용해야 한다. 빨강 대신 굵기로 표시한다 */
+.col.ref .c-hit { color: var(--ink); font-weight: 600; }
+.col.ref .cap .side { color: #bdbdbd; }
+
+/* 지금 이야기하는 줄 */
+.hl { background: rgba(255,51,0,.13); display: block; }
+
+/* 덩어리 아래 메시지 — 한 덩어리에 두세 개 */
+.msgs { list-style: none; display: flex; flex-direction: column; gap: clamp(.3rem,.9vh,.6rem); }
+.msgs li {
+    display: flex; gap: .6em; align-items: flex-start;
+    font-size: clamp(.95rem, 1.18vw, 1.7rem);
+    line-height: 1.5; font-weight: 500;
+}
+.msgs li::before {
+    content: ""; flex: 0 0 auto;
+    width: .5em; height: .5em; margin-top: .48em;
+    background: var(--red);
+}
+.msgs li b { color: var(--red); font-weight: 700; }
+.msgs li.ask { font-weight: 700; font-size: clamp(1.05rem, 1.34vw, 1.92rem); }
+.msgs li.ask::before { background: var(--ink); }
+
+/* ===========================================
+   6-C. 2층 — 기계가 한 말
+   컴파일러 출력은 터미널처럼 어둡게. 코드 패널과 성격을 구분한다
+   =========================================== */
+.machine { border: 2px solid var(--ink); background: #14171c; }
+.machine > .cap { background: var(--ink); color: var(--paper); }
+.machine > .cap .side { color: var(--amber, #e0a458); }
+.machine pre {
+    color: #d5d1c9;
+    font-size: clamp(.9rem, min(1.1vw, 1.9vh), 1.6rem);
+    line-height: 1.55;
+}
+.m-err  { color: #ff6a3d; font-weight: 600; }
+.m-warn { color: #e0a458; font-weight: 600; }
+.m-dim  { color: #7e858f; }
+.m-ok   { color: #8fbf8f; }
+
+/* ===========================================
+   6-D. 전환 — 틀렸던 것에서 고친 것으로
+   두 상태를 같은 격자 칸에 포갠다. 높이가 한 픽셀도 변하지 않으므로
+   아래 코드가 흔들리지 않는다. 움직이는 것은 opacity 와 transform 뿐
+   =========================================== */
+/* pre 안에서 바뀌는 줄만 겹쳐 둔다.
+   공통 줄은 DOM 에 한 번만 있으므로 전환 때 깜빡이지 않는다 */
+.swap { display: inline-grid; vertical-align: top; }
+.swap > * { grid-area: 1 / 1; white-space: pre; }
+.swap > .st-b {                      /* 틀렸던 것 — 짧고 빠르게 나간다 */
+    opacity: 1; transform: none;
+    transition: opacity .15s cubic-bezier(.4,0,1,1), transform .15s cubic-bezier(.4,0,1,1);
+}
+.swap > .st-a {                      /* 고친 것 — 조금 늦게, 부드럽게 들어온다 */
+    opacity: 0; transform: translateY(.35em);
+    transition: opacity .26s cubic-bezier(0,0,.2,1) .1s, transform .26s cubic-bezier(0,0,.2,1) .1s;
+}
+.slide[data-step="1"] .swap > .st-b { opacity: 0; transform: translateY(-.35em); }
+.slide[data-step="1"] .swap > .st-a { opacity: 1; transform: none; }
+
+/* 전환 뒤에야 의미가 생기는 메시지 */
+.msgs li.late { opacity: 0; transform: translateY(.3em); transition: opacity .3s ease, transform .3s ease; }
+.slide[data-step="1"] .msgs li.late { opacity: 1; transform: none; }
+
+/* 아직 누를 단계가 남았다는 표시 — 발표자가 보는 신호 */
+.step-dot {
+    position: absolute; right: var(--slide-padding); bottom: 0;
+    width: clamp(9px, .7vw, 14px); aspect-ratio: 1; border-radius: 50%;
+    background: var(--red); z-index: 3;
+    animation: breathe 1.9s ease-in-out infinite;
+}
+.slide[data-step="1"] .step-dot { display: none; }
+@keyframes breathe { 50% { opacity: .25; } }
+
+/* ===========================================
+   7. 등장 애니메이션 — 슬라이드가 보일 때 한 번
+   =========================================== */
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal:nth-child(1) { transition-delay: .06s; }
+.slide.visible .reveal:nth-child(2) { transition-delay: .16s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: .26s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: .36s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: .46s; }
+
+/* ===========================================
+   8. 진행 막대 · 이동 점 · 조작 안내
+   =========================================== */
+/* 진행 막대: width 대신 scaleX 를 움직인다. 레이아웃을 다시 계산하지 않는다 */
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 4px; width: 100%;
+    background: var(--red); z-index: 9999;
+    transform: scaleX(0); transform-origin: left center;
+    transition: transform .18s linear;
+}
+.nav-dots {
+    position: fixed; right: clamp(.6rem, 1.4vw, 1.4rem); top: 50%;
+    transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: .55rem; z-index: 9998;
+}
+.nav-dots button {
+    width: 9px; height: 9px; padding: 0; border: 1.5px solid var(--ink);
+    background: transparent; border-radius: 50%; cursor: pointer;
+    transition: background .2s, transform .2s;
+}
+.nav-dots button.active { background: var(--red); border-color: var(--red); transform: scale(1.35); }
+.keyboard-hint {
+    animation: hint-out .5s 5s forwards;
+    position: fixed; left: clamp(.6rem,1.4vw,1.4rem); bottom: clamp(.5rem,1.2vh,1rem);
+    font-family: var(--font-mono); font-size: clamp(.55rem,1vh,.72rem);
+    color: var(--mut); z-index: 9998; opacity: .75;
+}
+
+@keyframes hint-out { to { opacity: 0; visibility: hidden; } }
+
+/* ===========================================
+   9. 브라우저 편집 모드 (E 키 또는 왼쪽 위 모서리)
+   =========================================== */
+.edit-hotzone {
+    position: fixed; top: 0; left: 0; width: 80px; height: 80px;
+    z-index: 10000; cursor: pointer;
+}
+.edit-toggle {
+    position: fixed; top: 14px; left: 14px;
+    width: 42px; height: 42px; border: 2px solid var(--ink);
+    background: var(--paper); border-radius: 50%; cursor: pointer;
+    font-size: 17px; line-height: 1;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s ease;
+    z-index: 10001;
+}
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+.edit-toggle.active { background: var(--red); border-color: var(--red); }
+.edit-banner {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--ink); color: var(--paper);
+    font-family: var(--font-mono); font-size: clamp(.6rem,1.1vh,.78rem);
+    padding: .55em 1em; text-align: center;
+    transform: translateY(100%); transition: transform .3s var(--ease);
+    z-index: 10001;
+}
+.edit-banner.active { transform: translateY(0); }
+body.edit-active [contenteditable] {
+    outline: 1px dashed var(--red);
+    outline-offset: 3px;
+}
+body.edit-active [contenteditable]:focus {
+    outline: 2px solid var(--red);
+    background: rgba(255,51,0,.05);
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<nav class="nav-dots" id="navDots" aria-label="슬라이드 이동"></nav>
+<div class="keyboard-hint">← → 이동 · E 편집 · Ctrl+S 저장</div>
+
+<div class="edit-hotzone" aria-hidden="true"></div>
+<button class="edit-toggle" id="editToggle" title="편집 모드 (E)" aria-label="편집 모드 켜기">✏️</button>
+<div class="edit-banner" id="editBanner">편집 모드 · 글자를 눌러 고치세요 · Ctrl+S 로 파일 저장 · E 로 끄기</div>
+
+<!-- ============================================================
+     00 · 결론 먼저 (두괄식)
+     대본:
+     "안녕하세요. 오늘 발표할 내용은 'C의 배열은 함수에 들어가는 순간 배열이 아니다' 입니다."
+     ============================================================ -->
+<section class="slide" id="s1">
+    <div class="head head-space">
+        <span class="label">Krafton Jungle · Week 04</span>
+        <span class="num">00</span>
+    </div>
+    <div class="slide-content">
+        <div class="dot decorative" aria-hidden="true"></div>
+        <span class="eyebrow reveal">Troubleshooting</span>
+        <h1 class="reveal">C의 배열은 함수에 들어가는 순간 <em>배열이 아니다</em></h1>
+        <div class="rule reveal"></div>
+        <p class="sub reveal">08_bubble_sort.c</p>
+    </div>
+    <div class="foot"><span>porting/08_bubble_sort.c</span><span>2 MIN</span></div>
+</section>
+
+<!-- ============================================================
+     들어가기 전에 · 퀴즈 하나
+     대본:
+     "간단한 문제 하나 내볼게요. 화면에 있는 두 개의 sizeof() 는 각각 몇인가요?"
+       ── 5초쯤 기다렸다가 한 번 누른다 ──
+     "맞습니다. 왼쪽은 20 이고 오른쪽은 8 이죠. 함수 내부에서 arr 를 포인터로 가져오기 때문입니다."
+     ============================================================ -->
+<section class="slide" id="s1b" data-step="0">
+    <div class="head head-space">
+        <span class="label">들어가기 전에 · 퀴즈 하나</span>
+        <span class="num">01</span>
+    </div>
+    <div class="slide-content">
+        <h2 class="thesis reveal">두 <b>sizeof</b> 는 각각 몇일까요?</h2>
+        <div class="mirror reveal">
+            <div class="panel">
+                <div class="cap"><span>식에 놓인 배열</span><span class="side">main</span></div>
+<pre>int main(void) {
+    int <span class="c-hit">scores[5]</span>;
+    sizeof(scores);   <span class="swap"><span class="st-b c-com">// ?</span><span class="st-a c-ans">// 20</span></span>
+    show(scores);
+}</pre>
+            </div>
+            <div class="panel accent">
+                <div class="cap"><span>인자로 들어간 배열</span><span class="side">show</span></div>
+<pre>void show(<span class="swap"><span class="st-b c-hit">int arr[]</span><span class="st-a c-ans">int *arr</span></span>) {
+    sizeof(arr);      <span class="swap"><span class="st-b c-com">// ?</span><span class="st-a c-ans">// 8</span></span>
+    <span class="swap"><span class="st-b">arr[1] = 0;</span><span class="st-a c-ans">*(arr + 1) = 0;</span></span>
+}</pre>
+            </div>
+        </div>
+        <p class="punch late reveal">함수 안에서는 arr 가 <b>포인터</b>로 들어옵니다.</p>
+    </div>
+    <div class="foot"><span>sizeof 만 진실을 말한다</span></div>
+    <div class="step-dot" aria-hidden="true"></div>
+</section>
+
+<!-- ============================================================
+     起 · 내 len() 을 만들다
+     대본:
+     "제가 어제 Bubble Sort 를 풀었을 때의 문제가 이거였습니다. 따라가 보죠.
+      Bubble Sort 를 돌리려면 이중 for 문이 필요하죠. 그래서 len(arr) 같은 걸 제가 만들었고요."
+     ============================================================ -->
+<section class="slide" id="s2">
+    <div class="head head-space">
+        <span class="label">起 · 내 len() 을 만들다</span>
+        <span class="num">02</span>
+    </div>
+    <div class="slide-content">
+        <h2 class="thesis reveal">이중 for 문에는 길이가 필요해서, <b>len ()를 제작</b></h2>
+        <div class="work">
+            <div class="col src zoom-b reveal">
+                <div class="panel">
+                    <div class="cap"><span>08_bubble_sort.py</span><span class="side">있다</span></div>
+<pre>n = <span class="c-hit">len(arr)</span></pre>
+                </div>
+                <div class="panel accent">
+                    <div class="cap"><span>08_bubble_sort.c</span><span class="side">4 – 9</span></div>
+<pre>int ed(const int arr []){
+    return (arr <span class="c-hit">== bb1</span>) ? (int)(sizeof(bb1) / sizeof(bb1[0])) - 1 :
+           (arr <span class="c-hit">== bb2</span>) ? (int)(sizeof(bb2) / sizeof(bb2[0])) - 1 :
+           (arr <span class="c-hit">== bb3</span>) ? (int)(sizeof(bb3) / sizeof(bb3[0])) - 1 :
+                          <span class="c-hit">0</span>;
+}</pre>
+                </div>
+                <p class="punch reveal">받은 주소를 bb1·bb2·bb3 과 대조해서 길이 반환. main 에서는 <b>bb1이 6</b>, 성공.</p>
+            </div>
+        <div class="col ref">
+            <div class="panel">
+                <div class="cap"><span>08_bubble_sort_cases.h</span><span class="side">INPUT</span></div>
+<pre><span class="c-hit">const</span> int bb1[] = {64, 34, 25, 12, 22, 11, 90};
+<span class="c-hit">const</span> int bb2[] = {1, 2, 3, 4, 5};
+<span class="c-hit">const</span> int bb3[] = {5, 4, 3, 2, 1};</pre>
+            </div>
+            <div class="panel">
+                <div class="cap"><span>08_bubble_sort_output.txt</span><span class="side">EXPECTED</span></div>
+<pre>=== 테스트 케이스 1 ===
+<span class="c-hit">정렬 전</span>: [64, 34, 25, 12, 22, 11, 90]
+<span class="c-hit">정렬 후</span>: [11, 12, 22, 25, 34, 64, 90]
+=== 테스트 케이스 2: 이미 정렬됨 ===
+정렬 전: [1, 2, 3, 4, 5]
+정렬 후: [1, 2, 3, 4, 5]
+최적화 버전은 1번의 패스만 수행
+=== 테스트 케이스 3: 역순 ===
+정렬 전: [5, 4, 3, 2, 1]
+정렬 후: [1, 2, 3, 4, 5]</pre>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="foot"><span>porting/08_bubble_sort.c</span></div>
+</section>
+
+<!-- ============================================================
+     承 · copy1 이 태어나다
+     대본:
+     "그 다음에 원본 배열을 유지하고 싶어서 배열을 복사했습니다.
+      복사한 배열을 정렬하고, 출력할 때 for 문으로 하나씩 꺼내겠다는 의도죠."
+     ============================================================ -->
+<section class="slide" id="s3">
+    <div class="head head-space">
+        <span class="label">承 · copy1 이 태어나다</span>
+        <span class="num">03</span>
+    </div>
+    <div class="slide-content">
+        <h2 class="thesis reveal">원본을 그대로 두고 <b>사본을 제작</b></h2>
+        <div class="work">
+            <div class="col src zoom-c reveal">
+                <div class="panel accent">
+                    <div class="cap"><span>08_bubble_sort.c · main (케이스 1만)</span><span class="side">23 – 41</span></div>
+<pre>int main(void){
+<span class="c-com">// Case 1 (before) — 원본 bb1 을 그대로 출력</span>
+    for (int i = 0; i &lt; ed(bb1); i++){ printf("%d, ", bb1[i]); }
+
+<span class="c-com">// Case 1 (after)</span>
+    int <span class="c-hit">copy1</span> [ed(bb1)+1];
+    <span class="c-hit">for</span> (int i = ed(bb1); i &gt;= 0; i--){
+        <span class="c-hit">copy1[i] = bb1[i];</span>
+    } <span class="c-com">// for not changing the Original bb1 (const).</span>
+    bbSort(copy1);
+    for (int i = 0; i &lt; ed(bb1); i++){ printf("%d, ", copy1[i]); }</pre>
+                </div>
+                <p class="punch reveal">원본 bb1 은 그대로 두고, <b>copy1 을 정렬</b>해서 출력</p>
+            </div>
+        <div class="col ref">
+            <div class="panel">
+                <div class="cap"><span>08_bubble_sort_cases.h</span><span class="side">INPUT</span></div>
+<pre><span class="c-hit">const</span> int bb1[] = {64, 34, 25, 12, 22, 11, 90};
+<span class="c-hit">const</span> int bb2[] = {1, 2, 3, 4, 5};
+<span class="c-hit">const</span> int bb3[] = {5, 4, 3, 2, 1};</pre>
+            </div>
+            <div class="panel">
+                <div class="cap"><span>08_bubble_sort_output.txt</span><span class="side">EXPECTED</span></div>
+<pre>=== 테스트 케이스 1 ===
+<span class="c-hit">정렬 전</span>: [64, 34, 25, 12, 22, 11, 90]
+<span class="c-hit">정렬 후</span>: [11, 12, 22, 25, 34, 64, 90]
+=== 테스트 케이스 2: 이미 정렬됨 ===
+정렬 전: [1, 2, 3, 4, 5]
+정렬 후: [1, 2, 3, 4, 5]
+최적화 버전은 1번의 패스만 수행
+=== 테스트 케이스 3: 역순 ===
+정렬 전: [5, 4, 3, 2, 1]
+정렬 후: [1, 2, 3, 4, 5]</pre>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="foot"><span>porting/08_bubble_sort.c</span></div>
+</section>
+
+<!-- ============================================================
+     轉 · 둘이 만나 터지다   [전환 2단계]
+     대본:
+     "그리고 맞닥뜨린 게 이 부분입니다. 한참을 헤맸는데요.
+      아까 ed(arr) 함수를 len(arr) 처럼 만들었다고 했죠."
+       ── 한 번 누른다: copy1·2·3 이 arr 로 들어온다는 표시, ed 의 비교 줄에 밑줄, 0 에 상자 ──
+     "0 부터 길이까지, 0 부터 길이-i 로 이중 for 문을 돌리는데, 함수가 실행이 전혀 안 되는 거예요.
+      계속 건너뛰더라고요. (0 을 가리키며) 함수 안에서 arr 의 사이즈를 구할 수가 없는 거죠.
+      arr 가 포인터로 들어가니까."
+       ── 한 번 더 누른다: n 으로 고친 버전, ed(bb1)+1 이 n 으로 들어온다는 표시, 오른쪽은 main 호출부 ──
+     "그래서 arr 를 정렬할 때에는 반드시 인자로 사이즈를 넣어 줘야 합니다. 바깥에서 미리 계산해서요."
+     ============================================================ -->
+<section class="slide" id="s4" data-step="0" data-max-step="2">
+    <div class="head head-space">
+        <span class="label">轉 · 둘이 만나 터지다</span>
+        <span class="num">04</span>
+    </div>
+    <div class="slide-content">
+        <h2 class="thesis reveal">조용히 컴파일되고, 조용히 실행되고, <b>정렬은 안 되고</b></h2>
+        <div class="work">
+            <div class="col src zoom-c reveal">
+                <div class="panel accent">
+                    <div class="cap"><span>08_bubble_sort.c · bbSort</span><span class="side">11 – 21</span></div>
+                    <div class="args" aria-hidden="true">
+                        <div class="arg a1">copy1 · copy2 · copy3 <small>(포인터로)</small><span class="to">→</span><code>int arr []</code></div>
+                        <div class="arg a2">ed(bb1)+1 · ed(bb2)+1 · ed(bb3)+1<span class="to">→</span><code>int n</code></div>
+                    </div>
+<pre><span class="swap s2"><span class="st-b">void bbSort(int arr []){
+    for (int i = 0; i &lt; <span class="c-hit">ed(arr)</span>; i++){
+        for (int j = 0; j &lt; <span class="c-hit">ed(arr)</span> - i; j++){</span><span class="st-a">void bbSort(int arr [], <span class="c-hit">int n</span>){
+    for (int i = 0; i &lt; <span class="c-hit">n</span>; i++){
+        for (int j = 0; j &lt; <span class="c-hit">n</span> - i - 1; j++){</span></span>
+            if (arr[j] &gt; arr[j+1]){
+                int tmp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = tmp;
+            }
+        }
+    }
+}</pre>
+                </div>
+                <p class="punch late reveal">함수 안에서는 arr 의 크기를 알 수 없음. <b>길이는 바깥에서 계산해 인자로</b> 넣어야 함.</p>
+            </div>
+        <div class="col ref">
+            <div class="panel">
+                <div class="cap"><span>08_bubble_sort_cases.h</span><span class="side">INPUT</span></div>
+<pre><span class="c-hit">const</span> int bb1[] = {64, 34, 25, 12, 22, 11, 90};
+<span class="c-hit">const</span> int bb2[] = {1, 2, 3, 4, 5};
+<span class="c-hit">const</span> int bb3[] = {5, 4, 3, 2, 1};</pre>
+            </div>
+            <div class="panel accent peek peek-ed">
+                <div class="cap"><span>ed · 값으로 줄임</span><span class="side">4 – 9</span></div>
+<pre>int ed(const int arr []){
+    return <span class="ul">(arr <span class="c-hit">== bb1</span>)</span> ? 6 :
+           <span class="ul">(arr <span class="c-hit">== bb2</span>)</span> ? 4 :
+           <span class="ul">(arr <span class="c-hit">== bb3</span>)</span> ? 4 :
+                          <span class="zero">0</span>;
+}</pre>
+            </div>
+            <div class="panel accent peek peek-main">
+                <div class="cap"><span>08_bubble_sort.c · main</span><span class="side">33 – 37</span></div>
+<pre>int copy1 [<span class="c-hit">ed(bb1)+1</span>];
+for (int i = ed(bb1); i &gt;= 0; i--){
+    copy1[i] = bb1[i];
+}
+bbSort(copy1, <span class="c-hit">ed(bb1)+1</span>);  <span class="c-com">// 길이는 밖에서</span></pre>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="step-dot" aria-hidden="true"></div>
+    <div class="foot"><span>porting/08_bubble_sort.c</span></div>
+</section>
+
+<!-- ============================================================
+     結 · gdb 로 본 진짜 이유
+     대본:
+     "이건 제가 실제로 디버거로 찍은 내용입니다.
+      인자로 받았던 ed(arr) 는 0 으로 찍히죠. (ed(bb1) 을 가리키며) 원래의 사이즈가 아니라."
+     ============================================================ -->
+<section class="slide" id="s5">
+    <div class="head head-space">
+        <span class="label">結 · ed 는 len 이 아니었다</span>
+        <span class="num">05</span>
+    </div>
+    <div class="slide-content">
+        <h2 class="reveal">ed 는 <em>주소를 대조하고 있었다!</em></h2>
+        <div class="panels trio reveal">
+            <div class="panel accent tall">
+                <div class="cap"><span>gdb · bbSort 안에서</span><span class="side">실제 기록</span></div>
+<pre><span class="c-dim">Breakpoint 1, bbSort (arr=0x7fffffffc730, n=7)</span>
+
+(gdb) p arr == bb1
+$1 = <span class="c-hit">0</span>
+
+(gdb) p <span class="c-hit">ed(arr)</span>
+$2 = <span class="c-hit">0</span>
+
+(gdb) p ed(bb1)
+$3 = 6
+
+(gdb) p sizeof(arr)
+$4 = <span class="c-hit">8</span>      <span class="c-com">포인터</span>
+
+(gdb) p sizeof(bb1)
+$5 = 28     <span class="c-com">배열</span></pre>
+            </div>
+            <div class="panel">
+                <div class="cap"><span>ed · 값으로 줄임</span><span class="side">4 – 9</span></div>
+<pre>int ed(const int arr []){
+    return (arr <span class="c-hit">== bb1</span>) ? 6 :
+           (arr <span class="c-hit">== bb2</span>) ? 4 :
+           (arr <span class="c-hit">== bb3</span>) ? 4 :
+                          <span class="c-hit">0</span>;
+}</pre>
+            </div>
+            <div class="panel">
+                <div class="cap"><span>bbSort · 틀렸던 것</span><span class="side">11 – 13</span></div>
+<pre>void bbSort(int arr []){
+    for (int i = 0; i &lt; <span class="c-hit">ed(arr)</span>; i++){
+        for (int j = 0; j &lt; <span class="c-hit">ed(arr)</span> - i; j++){
+            <span class="c-com">...</span></pre>
+            </div>
+        </div>
+        <p class="punch reveal">arr 는 셋 중 무엇도 아니라서 <b>0</b> 이에요. ed 는 길이가 아니라 <b>신원</b>을 확인하고 있었습니다.</p>
+    </div>
+    <div class="foot"><span>포인터는 값이 아니라 정체를 실어 나른다</span></div>
+</section>
+
+<!-- ============================================================
+     끝 · 클로징
+     대본:
+     "따라서 제가 얻은 결론은 이렇습니다. 함수에 들어가는 순간 배열은 포인터가 되기 때문에,
+      반복문이나 정렬을 돌리고 싶으면 길이를 인자로 넣어야 한다."
+     ============================================================ -->
+<section class="slide" id="s6">
+    <div class="head head-space">
+        <span class="label">가져가실 것</span>
+        <span class="num">06</span>
+    </div>
+    <div class="slide-content">
+        <h1 class="reveal">C의 배열은 함수에 들어가는 순간 <em>배열이 아니다</em></h1>
+        <div class="rule reveal"></div>
+        <div class="takeaway reveal">
+            <span class="k">체크 항목</span>
+            함수에 들어가는 순간 배열은 <b>포인터</b>가 됩니다.<br>반복문이나 정렬을 돌리고 싶으면 <b>길이를 인자로</b> 넣어야 합니다.
+        </div>
+    </div>
+    <div class="foot"><span>2026-09-17 · WEEK 04</span></div>
+</section>
+
+<script>
+/* ===========================================
+   슬라이드 조작기
+   키보드 · 휠 · 터치 · 이동 점 · 진행 막대
+   =========================================== */
+class SlidePresentation {
+    constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.current = 0;
+        this.progressBar = document.getElementById('progressBar');
+        this.navDotsContainer = document.getElementById('navDots');
+        this.setupIntersectionObserver();
+        this.setupNavDots();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupProgressBar();
+    }
+
+    /* 화면에 들어온 슬라이드에 .visible 을 붙여 등장 애니메이션을 켠다 */
+    setupIntersectionObserver() {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    this.current = this.slides.indexOf(e.target);
+                    this.updateNavDots();
+                }
+            });
+        }, { threshold: 0.5 });
+        this.slides.forEach(s => io.observe(s));
+    }
+
+    /* 오른쪽 이동 점. 다시 그리기 전에 반드시 비운다
+       (편집 모드에서 저장한 파일을 다시 열면 점이 겹쳐 쌓이기 때문) */
+    setupNavDots() {
+        this.navDotsContainer.innerHTML = '';
+        this.slides.forEach((s, i) => {
+            const b = document.createElement('button');
+            b.setAttribute('aria-label', (i + 1) + '번 슬라이드로');
+            b.addEventListener('click', () => this.goTo(i));
+            this.navDotsContainer.appendChild(b);
+        });
+        this.updateNavDots();
+    }
+    updateNavDots() {
+        Array.from(this.navDotsContainer.children).forEach((b, i) => {
+            b.classList.toggle('active', i === this.current);
+        });
+        this.updateProgress();
+    }
+
+    goTo(i) {
+        if (i < 0 || i >= this.slides.length) return;
+        this.slides[i].scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /* 단계가 있는 슬라이드: 화살표가 먼저 단계를 넘기고,
+       단계를 다 쓰면 그때 다음 장으로 간다 (reveal.js 의 fragment 와 같은 규칙) */
+    maxStep(slide) { return slide.dataset.maxStep ? Number(slide.dataset.maxStep) : (slide.querySelector('.swap') ? 1 : 0); }
+
+    next() {
+        const s = this.slides[this.current];
+        const step = Number(s.dataset.step || 0);
+        if (step < this.maxStep(s)) { s.dataset.step = step + 1; return; }
+        this.goTo(this.current + 1);
+    }
+    prev() {
+        const s = this.slides[this.current];
+        const step = Number(s.dataset.step || 0);
+        if (step > 0) { s.dataset.step = step - 1; return; }
+        /* 앞 장으로 돌아갈 때는 그 장을 마지막 단계로 열어 둔다 */
+        const t = this.slides[this.current - 1];
+        if (t) t.dataset.step = this.maxStep(t);
+        this.goTo(this.current - 1);
+    }
+
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (e.target.getAttribute('contenteditable')) return;  /* 편집 중에는 이동하지 않는다 */
+            switch (e.key) {
+                case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ':
+                    e.preventDefault(); this.next(); break;
+                case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+                    e.preventDefault(); this.prev(); break;
+                case 'Home': e.preventDefault(); this.goTo(0); break;
+                case 'End':  e.preventDefault(); this.goTo(this.slides.length - 1); break;
+            }
+        });
+    }
+
+    setupTouchNav() {
+        let y0 = null;
+        document.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; }, { passive: true });
+        document.addEventListener('touchend', e => {
+            if (y0 === null) return;
+            const dy = y0 - e.changedTouches[0].clientY;
+            if (Math.abs(dy) > 50) { dy > 0 ? this.next() : this.prev(); }
+            y0 = null;
+        }, { passive: true });
+    }
+
+    setupProgressBar() {
+        window.addEventListener('scroll', () => this.updateProgress(), { passive: true });
+        this.updateProgress();
+    }
+    updateProgress() {
+        const p = this.current / Math.max(1, this.slides.length - 1);
+        this.progressBar.style.transform = 'scaleX(' + p + ')';
+    }
+}
+
+/* ===========================================
+   브라우저 편집기
+   E 키 또는 왼쪽 위 모서리 → 글자를 눌러 수정 → Ctrl+S 로 파일 저장
+   수정한 내용은 localStorage 에 자동 보관된다
+   =========================================== */
+class InlineEditor {
+    constructor() {
+        this.isActive = false;
+        this.key = 'week04-array-slides';
+        this.targets = 'h1, h2, p.sub, p.punch, .takeaway, .msgs li, .cap span, .foot span';
+        this.toggleBtn = document.getElementById('editToggle');
+        this.signature();   /* 원본 서명을 먼저 굳힌다 */
+        this.banner = document.getElementById('editBanner');
+        this.restore();
+        this.bindSave();
+    }
+
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('edit-active', this.isActive);
+        this.toggleBtn.classList.toggle('active', this.isActive);
+        this.banner.classList.toggle('active', this.isActive);
+        document.querySelectorAll(this.targets).forEach(el => {
+            if (this.isActive) {
+                el.setAttribute('contenteditable', 'true');
+                el.addEventListener('input', this.save);
+            } else {
+                el.removeAttribute('contenteditable');
+            }
+        });
+    }
+
+    save = () => {
+        const data = {};
+        document.querySelectorAll('.slide').forEach((s, i) => { data[i] = s.innerHTML; });
+        try {
+            localStorage.setItem(this.key, JSON.stringify({ sig: this.signature(), data }));
+        } catch (e) {}
+    }
+
+    /* 파일이 바뀌면 저장본은 버린다.
+       이게 없으면 한 번 저장한 내용이 파일을 영원히 덮어써서,
+       소스를 고쳐도 브라우저에 옛 화면이 계속 나온다 */
+    signature() {
+        /* restore() 보다 먼저 한 번만 계산해 둔다 — 그래야 '파일 원본'의 서명이 된다 */
+        if (this._sig) return this._sig;
+        const src = [...document.querySelectorAll('.slide')].map(s => s.innerHTML).join('\u0000');
+        let h = 5381;
+        for (let i = 0; i < src.length; i++) h = ((h * 33) ^ src.charCodeAt(i)) >>> 0;
+        return (this._sig = src.length + '-' + h.toString(36));
+    }
+
+    restore() {
+        try {
+            const raw = localStorage.getItem(this.key);
+            if (!raw) return;
+            const saved = JSON.parse(raw);
+            if (!saved || saved.sig !== this.signature()) {
+                localStorage.removeItem(this.key);   /* 파일이 바뀌었다 — 저장본 폐기 */
+                return;
+            }
+            document.querySelectorAll('.slide').forEach((s, i) => {
+                if (saved.data[i]) s.innerHTML = saved.data[i];
+            });
+        } catch (e) {}
+    }
+
+    bindSave() {
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); this.exportFile(); }
+        });
+    }
+
+    /* 저장 전에 편집 흔적을 걷어낸다.
+       그러지 않으면 저장된 파일이 편집 모드에 갇힌 채로 열린다 */
+    exportFile() {
+        const editableEls = Array.from(document.querySelectorAll('[contenteditable]'));
+        editableEls.forEach(el => el.removeAttribute('contenteditable'));
+        document.body.classList.remove('edit-active');
+        this.toggleBtn.classList.remove('active', 'show');
+        this.banner.classList.remove('active', 'show');
+
+        const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+        if (this.isActive) {
+            document.body.classList.add('edit-active');
+            editableEls.forEach(el => el.setAttribute('contenteditable', 'true'));
+            this.toggleBtn.classList.add('active');
+            this.banner.classList.add('active');
+        }
+
+        const blob = new Blob([html], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'week04-array-in-c.html';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+}
+
+const deck = new SlidePresentation();
+const editor = new InlineEditor();
+
+/* 편집 버튼 노출 — 왼쪽 위 모서리에 400ms 유예를 두고 나타난다
+   (CSS 형제 선택자로는 버튼에 닿기 전에 사라져서 누를 수 없다) */
+const hotzone = document.querySelector('.edit-hotzone');
+const editToggle = document.getElementById('editToggle');
+let hideTimeout = null;
+
+hotzone.addEventListener('mouseenter', () => {
+    clearTimeout(hideTimeout);
+    editToggle.classList.add('show');
+});
+hotzone.addEventListener('mouseleave', () => {
+    hideTimeout = setTimeout(() => {
+        if (!editor.isActive) editToggle.classList.remove('show');
+    }, 400);
+});
+editToggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+editToggle.addEventListener('mouseleave', () => {
+    hideTimeout = setTimeout(() => {
+        if (!editor.isActive) editToggle.classList.remove('show');
+    }, 400);
+});
+hotzone.addEventListener('click', () => editor.toggleEditMode());
+editToggle.addEventListener('click', () => editor.toggleEditMode());
+
+document.addEventListener('keydown', (e) => {
+    if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+        editor.toggleEditMode();
+    }
+});
+
+/* 첫 슬라이드는 바로 보이게 */
+document.getElementById('s1').classList.add('visible');
+</script>
+</body>
+</html>
