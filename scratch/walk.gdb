@@ -1,18 +1,24 @@
 # week04 전용 gdb 설정. make g_* 가 자동으로 읽는다.
-# 목록을 보려면 gdb 안에서  help user-defined
+# 명령 하나의 설명은 gdb 안에서  help 이름.  help user-defined 는 일부만 보여 준다.
 #
 # 여기에는 이번 주차의 변수 이름에 묶인 것만 둔다. 타입 이름을 모르는 범용 도구는
-# ~/.gdbinit 과 ~/.config/gdb/ 에 있고, 그쪽은 malloc-lab 과 Pintos 로 그대로 따라간다.
-#   walk EXPR [FIELD]   사슬을 따라간다 (walk.py)
-#   tk / itk / utk      track / info track / untrack (varwin.py)
+# ~/.config/gdb/ (gdbinit 과 *.py) 에 있고, 그쪽은 malloc-lab 과 Pintos 로 그대로 따라간다.
+#   dbg / vars / out    TUI 배치: 소스 크게 / 소스+값 / 프로그램 출력
+#   tk EXPR             값 하나를 한 행에 고정 (tk -l 은 그 주소에 고정)
+#   itk / utk N         목록 / N행 삭제. 범위는 utk 1..4, utk 6..
+#   tk walk EXPR N      사슬 앞 N 개를 한 행씩
+#   tk deep EXPR N      EXPR 이 닿는 구조체 전부, N 단계
+#   tk tri[0..5]        원소나 멤버를 한 행씩 (tk each PATTERN)
+#   walk EXPR [FIELD]   사슬을 한 번 출력 (walk.py)
+#   each [/FMT] PATTERN 원소나 멤버를 한 번 출력
+#   snap / snaps / back 이름 붙인 체크포인트 (snap.py)
 #   rerun               다시 컴파일한 바이너리로 재실행
-#   dbg                 TUI 켜기
 #
 # 아래 *watch 는 감시 표현을 한 번에 거는 묶음이다. 범위 밖 이름은 track 이
 # <not in scope> 행으로 남기므로, 지금 없는 변수가 섞여 있어도 해가 없다.
 
 # *watch 묶음이 공통으로 쓰는 창 설정.
-# cmdwin 은 터미널이 허용하는 만큼만 명령 창을 키운다 (최대 14줄).
+# cmdwin 은 터미널이 허용하는 만큼만 명령 창을 키운다 (인자 없이 쓰면 터미널 높이의 약 3분의 1, 최소 4줄).
 # 고정 숫자를 쓰면 짧은 터미널에서 gdb 가 조용히 거부한다.
 define watchwin
   vars
