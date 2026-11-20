@@ -1,81 +1,33 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CSAPP 3장 기계어 문제집</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111111'/%3E%3Ctext x='16' y='23' font-size='19' font-family='monospace' font-weight='700' text-anchor='middle' fill='%23FFFFFF'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://benjohnbill.github.io/assets/site.css">
 <style>
+  /* Restyled 2026-11-21 onto site.css (AGENTS.md § Site rules, box rules):
+     the page keeps its token names and points them at site tokens.
+     Color marks meaning only: green = right answer or progress, red = wrong answer. */
   :root {
-    --ground: #EEF1F5;
-    --surface: #FFFFFF;
-    --surface-sunk: #E3E8EF;
-    --ink: #16202B;
-    --ink-soft: #5A6673;
-    --ink-faint: #8D97A3;
-    --rule: #CBD3DD;
-    --rule-hard: #16202B;
-    --accent: #B4532A;
-    --accent-soft: #F3E3DA;
-    --struct: #1B3A6B;
-    --ok: #1F6B4E;
-    --ok-soft: #DCEDE5;
-    --no: #A3302B;
-    --no-soft: #F6DFDD;
-    --code-bg: #1A2430;
-    --code-ink: #DDE5EF;
-    --shadow: 0 1px 2px rgba(22,32,43,.07), 0 6px 18px -12px rgba(22,32,43,.35);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --ground: #0E141C;
-      --surface: #18202B;
-      --surface-sunk: #121A24;
-      --ink: #DEE5EE;
-      --ink-soft: #96A2B1;
-      --ink-faint: #6C7887;
-      --rule: #2B3644;
-      --rule-hard: #475060;
-      --accent: #E08A5C;
-      --accent-soft: #33231B;
-      --struct: #8CB0E8;
-      --ok: #62BB94;
-      --ok-soft: #16291F;
-      --no: #E08079;
-      --no-soft: #2C1817;
-      --code-bg: #0A0F16;
-      --code-ink: #CFD9E5;
-      --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 22px -14px rgba(0,0,0,.9);
-    }
-  }
-  :root[data-theme="dark"] {
-    --ground: #0E141C;
-    --surface: #18202B;
-    --surface-sunk: #121A24;
-    --ink: #DEE5EE;
-    --ink-soft: #96A2B1;
-    --ink-faint: #6C7887;
-    --rule: #2B3644;
-    --rule-hard: #475060;
-    --accent: #E08A5C;
-    --accent-soft: #33231B;
-    --struct: #8CB0E8;
-    --ok: #62BB94;
-    --ok-soft: #16291F;
-    --no: #E08079;
-    --no-soft: #2C1817;
-    --code-bg: #0A0F16;
-    --code-ink: #CFD9E5;
-    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 8px 22px -14px rgba(0,0,0,.9);
+    --ground: var(--bg);
+    --surface-sunk: var(--surface-2);
+    --ink-soft: var(--ink-2);
+    --ink-faint: var(--muted);
+    --rule: var(--line);
+    --rule-hard: var(--ink);
+    --accent: var(--ink);
+    --struct: var(--ink-2);
+    --ok: var(--s2);
+    --ok-soft: var(--s2-soft);
+    --no: var(--s1);
+    --no-soft: var(--s1-soft);
   }
 
   * { box-sizing: border-box; }
 
-  body {
-    background: var(--ground);
-    color: var(--ink);
-    font-family: "IBM Plex Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
-    font-size: 15px;
-    line-height: 1.75;
-    -webkit-font-smoothing: antialiased;
-  }
+  body { -webkit-font-smoothing: antialiased; }
 
   .page {
     max-width: 860px;
@@ -84,21 +36,19 @@
     padding-block: 0 72px;
   }
 
-  code, .mono { font-family: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace; }
+  code, .mono { font-family: var(--font-code); }
 
   .label {
-    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans KR", sans-serif;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .11em;
-    font-size: 11px;
+    font-family: var(--font-code);
+    font-weight: 600;
+    font-size: 13px;
     line-height: 1.4;
   }
 
   /* ---- masthead ---- */
   .masthead {
-    border-bottom: 2px solid var(--rule-hard);
-    padding-block: 40px 18px;
+    border-bottom: 3px solid var(--rule-hard);
+    padding-block: 22px 22px;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
@@ -106,22 +56,23 @@
     gap: 16px 24px;
   }
   .masthead h1 {
-    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans KR", sans-serif;
+    font-family: var(--font-head);
     font-weight: 700;
     font-size: clamp(30px, 6.4vw, 46px);
     line-height: 1.05;
-    letter-spacing: -.015em;
+    letter-spacing: -.02em;
     margin: 0;
     text-wrap: balance;
   }
-  .masthead h1 span { color: var(--accent); }
-  .masthead .eyebrow { color: var(--ink-soft); margin: 0 0 10px; }
+  .masthead h1 span { color: var(--ink-2); }
+  .masthead .eyebrow { color: var(--ink-faint); font-weight: 400; margin: 0 0 10px; }
+  .page > .home { display: inline-block; margin-top: 40px; }
   .masthead .meta {
     text-align: right;
     color: var(--ink-soft);
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.6;
-    font-family: "IBM Plex Mono", monospace;
+    font-family: var(--font-code);
   }
 
   .lede {
@@ -130,20 +81,6 @@
     max-width: 62ch;
   }
   .lede strong { color: var(--ink); font-weight: 600; }
-
-  /* ---- bit ruler ---- */
-  .ruler {
-    margin-top: 26px;
-    border-top: 1px solid var(--rule);
-    border-bottom: 1px solid var(--rule);
-    padding-block: 6px;
-    display: flex;
-    justify-content: space-between;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 10px;
-    color: var(--ink-faint);
-    letter-spacing: .06em;
-  }
 
   /* ---- progress ---- */
   .progress {
@@ -171,19 +108,19 @@
     display: block;
     height: 100%;
     width: 0%;
-    background: var(--accent);
-    transition: width .35s ease;
+    background: var(--ok);
+    transition: width .2s ease;
   }
   .progress .count {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 12px;
+    font-family: var(--font-code);
+    font-size: 13px;
     font-variant-numeric: tabular-nums;
     color: var(--ink-soft);
     white-space: nowrap;
   }
   .progress button {
     font: inherit;
-    font-size: 12px;
+    font-size: 13px;
     border: 1px solid var(--rule);
     background: transparent;
     color: var(--ink-soft);
@@ -191,7 +128,7 @@
     border-radius: 4px;
     cursor: pointer;
   }
-  .progress button:hover { border-color: var(--accent); color: var(--accent); }
+  .progress button:hover { border-color: var(--ink-2); color: var(--ink); }
 
   /* ---- section ---- */
   section.part { margin-bottom: 56px; }
@@ -205,34 +142,31 @@
     margin-bottom: 18px;
   }
   .part-num {
-    font-family: "IBM Plex Mono", monospace;
+    font-family: var(--font-code);
     font-weight: 600;
-    font-size: 13px;
-    color: var(--accent);
-    letter-spacing: .02em;
+    font-size: 14px;
+    color: var(--ink-faint);
     flex: none;
   }
   .part-head h2 {
-    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans KR", sans-serif;
+    font-family: var(--font-head);
     font-weight: 700;
-    font-size: 21px;
-    letter-spacing: -.005em;
+    font-size: 23px;
     margin: 0;
   }
   .part-head .en {
     color: var(--ink-faint);
-    font-size: 12px;
-    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    font-family: var(--font-code);
     margin-left: auto;
   }
 
   /* ---- brief (요약 카드) ---- */
   .brief {
-    background: var(--surface-sunk);
-    border-left: 3px solid var(--struct);
-    padding: 14px 16px;
+    border: 1px solid var(--rule);
+    padding: 18px 22px;
     margin-bottom: 22px;
-    font-size: 14px;
+    font-size: 16px;
   }
   .brief .label { color: var(--struct); margin-bottom: 8px; }
   .brief ul { margin: 0; padding-left: 18px; }
@@ -242,10 +176,8 @@
 
   /* ---- question ---- */
   .q {
-    background: var(--surface);
     border: 1px solid var(--rule);
-    box-shadow: var(--shadow);
-    padding: 20px 20px 18px;
+    padding: 22px 22px 20px;
     margin-bottom: 18px;
   }
   .q-head {
@@ -255,10 +187,10 @@
     margin-bottom: 10px;
   }
   .q-no {
-    font-family: "IBM Plex Mono", monospace;
+    font-family: var(--font-code);
     font-weight: 600;
-    font-size: 12px;
-    color: var(--surface);
+    font-size: 13px;
+    color: var(--bg);
     background: var(--ink);
     padding: 1px 7px;
     flex: none;
@@ -267,8 +199,8 @@
   .q-done {
     margin-left: auto;
     color: var(--ok);
-    font-size: 11px;
-    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    font-family: var(--font-code);
     opacity: 0;
     transition: opacity .2s;
   }
@@ -277,17 +209,17 @@
   .q .stem strong { font-weight: 600; }
 
   pre.asm {
-    background: var(--code-bg);
-    color: var(--code-ink);
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 13px;
-    line-height: 1.7;
+    background: var(--surface-2);
+    color: var(--ink);
+    font-family: var(--font-code);
+    font-size: 14px;
+    line-height: 1.6;
     padding: 12px 14px;
     margin: 0 0 14px;
-    overflow-x: auto;
-    border-left: 3px solid var(--accent);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
-  pre.asm .cm { color: #7D8CA0; }
+  pre.asm .cm { color: var(--muted); }
 
   /* choices */
   .choices { display: flex; flex-direction: column; gap: 7px; }
@@ -298,7 +230,7 @@
     text-align: left;
     font: inherit;
     color: inherit;
-    background: var(--surface);
+    background: transparent;
     border: 1px solid var(--rule);
     padding: 9px 12px;
     cursor: pointer;
@@ -306,15 +238,15 @@
     line-height: 1.6;
     transition: border-color .15s, background .15s;
   }
-  .choice:hover:not(:disabled) { border-color: var(--accent); }
+  .choice:hover:not(:disabled) { border-color: var(--ink-2); }
   .choice:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .choice .key {
-    font-family: "IBM Plex Mono", monospace;
+    font-family: var(--font-code);
     font-weight: 600;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--ink-faint);
     flex: none;
-    padding-top: 2px;
+    padding-top: 3px;
   }
   .choice[data-state="right"] { background: var(--ok-soft); border-color: var(--ok); }
   .choice[data-state="right"] .key { color: var(--ok); }
@@ -327,7 +259,7 @@
   .short { display: flex; flex-direction: column; gap: 9px; }
   .short textarea {
     font: inherit;
-    font-size: 14px;
+    font-size: 16px;
     background: var(--surface-sunk);
     color: var(--ink);
     border: 1px solid var(--rule);
@@ -340,11 +272,9 @@
 
   .reveal {
     font: inherit;
-    font-family: "IBM Plex Sans Condensed", "IBM Plex Sans KR", sans-serif;
+    font-family: var(--font-code);
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    font-size: 11px;
+    font-size: 13px;
     align-self: flex-start;
     background: var(--ink);
     color: var(--ground);
@@ -352,7 +282,7 @@
     padding: 7px 16px;
     cursor: pointer;
   }
-  .reveal:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .reveal:hover { background: var(--ink-2); border-color: var(--ink-2); }
   .reveal:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   /* explain block */
@@ -361,8 +291,8 @@
     border-top: 1px dashed var(--rule);
     padding-top: 14px;
     display: grid;
-    gap: 14px;
-    font-size: 14px;
+    gap: 16px;
+    font-size: 16px;
   }
   .explain[hidden] { display: none !important; }
   .explain .blk .label { margin-bottom: 4px; }
@@ -370,42 +300,44 @@
   .explain .blk ul { margin: 0; padding-left: 18px; }
   .ans .label { color: var(--ok); }
   .ans .verdict {
-    font-family: "IBM Plex Mono", monospace;
+    font-family: var(--font-code);
     font-weight: 600;
     color: var(--ok);
   }
-  .why .label { color: var(--accent); }
-  .find .label { color: var(--struct); }
+  .why .label { color: var(--ink-soft); }
+  .find .label { color: var(--ink-soft); }
   .use .label { color: var(--ink-faint); }
   .use {
     background: var(--surface-sunk);
-    padding: 11px 13px;
-    border-left: 3px solid var(--ink-faint);
+    padding: 14px 16px;
   }
   .find ul { list-style: none; padding-left: 0; display: grid; gap: 5px; }
   .find li {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 12.5px;
-    background: var(--accent-soft);
+    font-family: var(--font-code);
+    font-size: 14px;
+    background: var(--surface-sunk);
     color: var(--ink);
     padding: 4px 9px;
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
   .wrongs { list-style: none; padding-left: 0; display: grid; gap: 3px; margin-top: 6px; }
-  .wrongs li { color: var(--ink-soft); font-size: 13.5px; }
+  .wrongs li { color: var(--ink-soft); font-size: 16px; }
   .wrongs li b {
-    font-family: "IBM Plex Mono", monospace;
+    font-family: var(--font-code);
     color: var(--no);
     font-weight: 600;
     margin-right: 4px;
   }
 
   .tbl-wrap { overflow-x: auto; margin-bottom: 14px; }
+  /* phone: a cue above each table that scrolls sideways */
+  .scroll-hint { display: none; margin: 0 0 6px; color: var(--ink-faint); font-size: 14px; }
+  @media (max-width: 900px) { .scroll-hint { display: block; } }
   table.reg {
     border-collapse: collapse;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 12.5px;
+    font-family: var(--font-code);
+    font-size: 14px;
     min-width: 380px;
   }
   table.reg th, table.reg td {
@@ -417,11 +349,11 @@
   table.reg th { background: var(--surface-sunk); font-weight: 600; }
 
   footer.colophon {
-    border-top: 2px solid var(--rule-hard);
-    margin-top: 48px;
+    border-top: 1px solid var(--rule);
+    margin-top: 64px;
     padding-top: 16px;
     color: var(--ink-faint);
-    font-size: 12.5px;
+    font-size: 14px;
   }
   footer.colophon p { margin: 0 0 6px; }
 
@@ -435,8 +367,11 @@
     * { transition: none !important; animation: none !important; }
   }
 </style>
+</head>
+<body>
 
 <div class="page">
+  <a class="home" href="https://benjohnbill.github.io/">← 학습 기록</a>
 
   <header class="masthead">
     <div>
@@ -457,9 +392,6 @@
     기계에서 어떻게 굴러가는지 배경지식을 쌓는 것이 목적이에요.
   </p>
 
-  <div class="ruler mono">
-    <span>63</span><span>55</span><span>47</span><span>39</span><span>31</span><span>23</span><span>15</span><span>7</span><span>0</span>
-  </div>
 
   <div class="progress">
     <span class="label" style="color:var(--ink-faint)">진행</span>
@@ -660,6 +592,7 @@
 
     <div class="brief">
       <p class="label">한 장 요약</p>
+      <p class="scroll-hint" data-scroll-hint>표가 화면보다 넓어요. 옆으로 밀어서 보세요.</p>
       <div class="tbl-wrap">
         <table class="reg">
           <tr><th>C 선언</th><th>Intel 용어</th><th>접미사</th><th>크기</th></tr>
@@ -1048,6 +981,7 @@ jle   .L2</pre>
 
     <div class="brief">
       <p class="label">한 장 요약</p>
+      <p class="scroll-hint" data-scroll-hint>표가 화면보다 넓어요. 옆으로 밀어서 보세요.</p>
       <div class="tbl-wrap">
         <table class="reg">
           <tr><th>인자</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9~</th></tr>
@@ -1330,3 +1264,5 @@ long caller(void) {
   refresh();
 })();
 </script>
+</body>
+</html>
