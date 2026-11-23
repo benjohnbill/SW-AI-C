@@ -1,5 +1,11 @@
 # SW-AI-C data structures practice
 
+> **Codex:** this repository is its own git root, so Codex does not load the
+> workspace rules above it. Before the first reply, read
+> [`../AGENTS.md`](../AGENTS.md) (workspace router) and
+> [`../docs/tutor-spine.md`](../docs/tutor-spine.md) (tutor spine). Claude Code
+> already loads both through the parent `CLAUDE.md`.
+
 ## Purpose
 
 This repository holds the C data-structure exercises for week 4
